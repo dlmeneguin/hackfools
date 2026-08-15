@@ -1,11 +1,15 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+import json
 import sqlite3
+
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 
 app = Flask(__name__)
 app.secret_key = "chave super secreta"
 
+
 def get_db():
     db = sqlite3.connect("banco.db")
+    db.row_factory = sqlite3.Row
     cursor = db.cursor()
     return db, cursor
 
@@ -112,7 +116,67 @@ def marketplace(word):
         return redirect(url_for('login'))
     if session['login'] != word:
         return redirect(url_for('marketplace', word=session['login']))
-    return render_template("marketplace.html", word=word)
+
+    db, cursor = get_db()
+    cursor.execute(
+        "SELECT id, usuario, nome, categoria, raridade, preco FROM marketplace_items ORDER BY id DESC"
+    )
+    rows = cursor.fetchall()
+
+    db.close()
+
+    listings = [
+        {
+            "id": row["id"],
+            "seller": row["usuario"],
+            "name": row["nome"],
+            "category": row["categoria"],
+            "rarity": row["raridade"],
+            "price": row["preco"],
+        }
+        for row in rows
+    ]
+
+    listings_json = json.dumps(listings)
+
+    print(listings_json)
+
+    return render_template("marketplace.html", word=word, listings=listings, listings_json=listings_json)
+
+
+@app.route('/user/<word>/perfil', methods=['GET', 'POST'])
+def perfil(word):
+    if 'login' not in session:
+        flash("Favor realize o log-in")
+        return redirect(url_for('login'))
+    if session['login'] != word:
+        return redirect(url_for('perfil', word=session['login']))
+
+    if request.method == "POST":
+        nome = request.form.get("nome")
+        categoria = request.form.get("categoria")
+        raridade = request.form.get("raridade")
+        preco = request.form.get("preco")
+
+        if nome and categoria and raridade and preco:
+            try:
+                preco_int = int(preco)
+                db, cursor = get_db()
+                cursor.execute(
+                    "INSERT INTO marketplace_items (usuario, nome, categoria, raridade, preco) VALUES (?, ?, ?, ?, ?)",
+                    [word, nome, categoria, raridade, preco_int]
+                )
+                db.commit()
+                db.close()
+                flash("Anúncio criado com sucesso!")
+                return redirect(url_for('marketplace', word=word))
+            except Exception as e:
+                print(e)
+                if 'db' in locals():
+                    db.close()
+                flash("Erro ao criar anúncio.")
+
+    return render_template("perfil.html", word=word)
 
 
 @app.route('/user/<word>/lootbox', methods=['GET', 'POST'])

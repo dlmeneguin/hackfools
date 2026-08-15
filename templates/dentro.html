@@ -304,7 +304,9 @@
 
     <div class="navbar-user">
       <span class="user-name">{{ word }}</span>
-      <div class="user-avatar" title="Perfil">U</div>
+      <a href="/user/{{ word }}/perfil">
+        <div class="user-avatar" title="Perfil">U</div>
+      </a>
       <a href="/logout">
         <button class="btn-logout">Sair</button>
       </a>

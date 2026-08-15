@@ -334,7 +334,9 @@
 
     <div class="navbar-user">
       <span class="user-name">{{ word }}</span>
-      <div class="user-avatar" title="Perfil">U</div>
+      <a href="/user/{{ word }}/perfil">
+        <div class="user-avatar" title="Perfil">U</div>
+      </a>
       <a href="/logout">
         <button class="btn-logout">Sair</button>
       </a>
@@ -416,18 +418,11 @@
     <span id="toast-message">Ação realizada com sucesso!</span>
   </div>
 
+  <div id="marketplace-user" data-user="{{ word }}" hidden></div>
+  <script type="application/json" id="marketplace-data">{{ listings_json }}</script>
+
   <script>
-    // ── Mock data for listings ───────────────────────────────
-    let LISTINGS = [
-      { id: 1, name: 'Platinado natural', category: 'Cabelo', rarity: 'lendario', seller: 'Dr. Arthur', price: 1500 },
-      { id: 2, name: 'Heterocromia', category: 'Olhos', rarity: 'lendario', seller: 'Dra. Elena', price: 1800 },
-      { id: 3, name: 'Inteligência Excepcional', category: 'Inteligência', rarity: 'epico', seller: 'Alex_Genetics', price: 950 },
-      { id: 4, name: 'Sorriso excepcional', category: 'Boca', rarity: 'epico', seller: 'Sérgio_V', price: 800 },
-      { id: 5, name: 'Azul acinzentado', category: 'Olhos', rarity: 'incomum', seller: 'BioTrader', price: 300 },
-      { id: 6, name: 'Atleticidade Elevada', category: 'Atleticidade', rarity: 'raro', seller: 'Luna_M', price: 550 },
-      { id: 7, name: 'Clara — textura suave', category: 'Pele', rarity: 'comum', seller: 'Carlos_H', price: 100 },
-      { id: 8, name: 'Crespo — preto profundo', category: 'Cabelo', rarity: 'incomum', seller: 'Ana_Gen', price: 250 },
-    ];
+    const LISTINGS = JSON.parse(document.getElementById('marketplace-data').textContent);
 
     const rarityLabels = {
       comum: 'Comum',
@@ -564,12 +559,13 @@
       const price = parseInt(itemPrice.value);
 
       const newId = LISTINGS.length ? Math.max(...LISTINGS.map(l => l.id)) + 1 : 1;
+      const seller = document.getElementById('marketplace-user').dataset.user;
       const newAd = {
         id: newId,
         name: name,
         category: category,
         rarity: rarity,
-        seller: '${word}',
+        seller: seller,
         price: price
       };
 
