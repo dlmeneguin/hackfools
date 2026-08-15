@@ -1,0 +1,90 @@
+Apresentação:
+canva/claude
+
+Features:
+Marketplace
+Sistema de edição
+Lootboxes
+
+Ideias:
+Assinatura (slide)
+aplicar a criação de crianças ao seu ambiente, 
+ex: quem nasce no saara tem adaptações ao calor e quem nasce na antartica tem adptaçoes ao frio
+ideia de nome do projeto: Gaia neogen // gaia => mae terra, neogen => nova genetica
+---------------------------------------------------------------------------------------------------------
+poblema: humanos não adaptaveis a ambientes extraterrestres
+solução: criação de criancas gamificada
+obs: vivemos no capitalismo, então foda-se as eticas, o negocio é ganhar grana.
+
+contexto do problema:
+  a humanidade está explorando a galaxia, mas o corpo humano não é adaptavel para os varios planetas
+  que estamos explorando, por isso criamos a "criação de filhos"/manipulação genética embrionaria 
+  para criar novos humanos adaptavels aos diversos ambientes adversos da galaxia.
+  mas somos uma empresa do diabo, então isso é tudo maquiagem para lucrarmos em cima de um poblema que existe,
+  por isso o foco na estética e não nas funçoes. obs: somos ex executivos da EA Games
+---------------------------------------------------------------------------------------------------------
+
+Dúvidas:
+Próteses
+Edição sem microtransações
+
+Necessidades:
+    autenticação -> sqlite
+    frontend -> html - jinja
+    backend -> flask
+
+Raridades:
+    Comum (Itens básicos de entrada, os mais comuns)
+    Raro (Itens incomuns)
+    Épico (Itens com características raras)
+    Lendário (Itens muito raros, com características únicas)
+    Mítico (Itens exclusivos de pacotes/eventos de tempo limitado)
+    
+Partes do corpo:
+    Cosméticos:
+        Cabelo (Cor, tipo)
+        Pele (Cor, textura)
+        Olhos
+        Boca
+        Nariz
+        Voz
+
+    Atributos:
+        Altura
+        Inteligencia
+        Carisma
+        Atleticidade
+        Sistema Imunológico
+        
+
+
+Flow do usuario:
+1. Logar o usuário
+
+    1.2 Tela de inicio
+
+    2.1 Acessar sistema de edição
+    2.2 Acessar Marketplace/Inventario
+    2.3 Lootboxes/Loja semanal
+
+Objetivos:
+    Editor:
+        Mudança de atributo qualitativo
+        Mudança de atributo contínuo (slider)
+        (NAO FAZER MAS FICA NO AR) preview
+
+    Maketplace:
+        Pagina de anúncios (front)
+        Pesquisa/filtro de anúncios
+        Interface de trading
+
+    Lootboxes:
+        Pagina de escolha com preços (front)
+        Sorteio de itens
+
+Tarefas:
+    Buscar pngs (Matheus)
+    Criar os itens ()
+    Estruturas de dados/funções (João)
+    Front (Daniel)
+    Animações()
