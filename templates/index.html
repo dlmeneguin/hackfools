@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png')}}">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -324,7 +326,7 @@
     <div class="hero-content">
       <h1 class="hero-title">Helix</h1>
       <p class="hero-sub">
-        Escolha a vida que você quer ter
+        Escolha a <u>vida</u> com quem você quer ter
       </p>
       <div class="hero-ctas">
         <a href="signin" class="btn-primary">Criar Conta</a>
@@ -340,10 +342,10 @@
   <section class="section-intro">
     <div class="two-col">
       <div>
-        <p class="section-label">[Rótulo da seção]</p>
-        <h2 class="section-title" style="font-size:clamp(28px,3.5vw,44px);margin-bottom:20px;line-height:1.15;">[Título da seção de introdução]</h2>
-        <p class="intro-body">[Parágrafo explicando a missão ou contexto da empresa. Este espaço pode conter duas ou três frases que estabelecem credibilidade e propósito.]</p>
-        <p class="intro-body" style="margin-bottom:0;">[Segundo parágrafo complementar, aprofundando a abordagem ou o diferencial da plataforma.]</p>
+        <p class="section-label">Introdução</p>
+        <h2 class="section-title" style="font-size:clamp(28px,3.5vw,44px);margin-bottom:20px;line-height:1.15;">Quem somos?</h2>
+        <p class="intro-body">Fundada com a missão de redefinir o futuro da saúde e do potencial humano, a nossa plataforma une a mais alta precisão da engenharia biomolecular à acessibilidade das tecnologias digitais. Trabalhamos para erradicar doenças hereditárias e oferecer às famílias a oportunidade de planejar gerações mais saudáveis, fortes e preparadas para os desafios do amanhã. Combinando rigor científico e transparência ética, estabelecemos um novo padrão global de excelência e segurança na edição genética.</p>
+        <p class="intro-body" style="margin-bottom:0;">Nosso grande diferencial reside na democratização e na intuição da experiência: transformamos processos genéticos altamente complexos em uma interface fluida, onde pais podem personalizar, organizar e gerenciar traços biológicos com total autonomia através do nosso Editor e Marketplace. Além disso, reafirmamos nosso compromisso social revertendo parte das operações para o financiamento de tratamentos genéticos em comunidades carentes, provando que a inovação de ponta e a equidade social podem avançar juntas.</p>
       </div>
       <div class="placeholder" style="min-height:360px;background:var(--bg-card);">
         <div class="placeholder-icon">+</div>
@@ -363,24 +365,24 @@
     </div>
     <div class="features-inner">
       <div class="features-header">
-        <p class="section-label">[Rótulo]</p>
-        <h2 class="section-title">[Título da seção de características]</h2>
+        <p class="section-label">Features</p>
+        <h2 class="section-title">O que oferecemos?</h2>
       </div>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-icon">◎</div>
-          <h3 class="feature-title">[Feature 01]</h3>
-          <p class="feature-desc">[Descrição curta desta característica ou benefício — uma ou duas linhas.]</p>
+          <h3 class="feature-title">Cápsulas</h3>
+          <p class="feature-desc">Adquira cápsulas genéticas randomizadas de diferentes raridades.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">◎</div>
-          <h3 class="feature-title">[Feature 02]</h3>
-          <p class="feature-desc">[Descrição curta desta característica ou benefício — uma ou duas linhas.]</p>
+          <h3 class="feature-title">Editor</h3>
+          <p class="feature-desc">Crie seu futuro filho com os elementos adquiridos.</p>
         </div>
         <div class="feature-card">
           <div class="feature-icon">◎</div>
-          <h3 class="feature-title">[Feature 03]</h3>
-          <p class="feature-desc">[Descrição curta desta característica ou benefício — uma ou duas linhas.]</p>
+          <h3 class="feature-title">Marketplace</h3>
+          <p class="feature-desc">Compre e venda atributos genéticos variados da sua escolha.</p>
         </div>
       </div>
     </div>
@@ -391,32 +393,19 @@
   <!-- ── Seção 4: lootbox ── -->
   <section class="section-lootbox">
     <div class="two-col">
-      <div class="placeholder" style="min-height:420px;background:var(--bg-alt);">
-        <div class="placeholder-icon">+</div>
-        <span class="placeholder-label">Visual da lootbox / produto</span>
+      <div class="placeholder" style="min-height: 420px; background: var(--bg-alt); position: relative; overflow: hidden;">
+        <img src="static/download.jpg" style="width: 100%; height: 100%; min-height: 420px; object-fit: cover; display: block; border-radius: 10px;">
       </div>
       <div>
-        <p class="lootbox-sub-label">[Rótulo do produto]</p>
-        <h2 class="lootbox-title">[Título sobre a mecânica de lootbox]</h2>
-        <p class="lootbox-body">[Explicação da experiência do lootbox genético — como funciona, o que o usuário pode descobrir, a lógica de raridade e curadoria científica.]</p>
+        <p class="lootbox-sub-label">Cápsulas Genéticas</p>
+        <h2 class="lootbox-title">Como escolher os traços?</h2>
+        <p class="lootbox-body">As Cápsulas Genéticas oferecem uma forma dinâmicade adquirir sequências DNA validadas, variando de otimizações metabólicas comuns a traços estéticos e físicos de alta raridade (como densidade óssea elevada ou heterocromia). Todo o conteúdo é filtrado por simulações bioéticas para garantir 100% de segurança e compatibilidade embrionária.</p>
         <ul class="bullet-list" style="list-style:none;">
-          <li class="bullet-item"><span class="bullet-dot"></span>[Detalhe ou vantagem 01]</li>
-          <li class="bullet-item"><span class="bullet-dot"></span>[Detalhe ou vantagem 02]</li>
-          <li class="bullet-item"><span class="bullet-dot"></span>[Detalhe ou vantagem 03]</li>
+          <li class="bullet-item"><span class="bullet-dot"></span>Garantia de Viabilidade Biológica</li>
+          <li class="bullet-item"><span class="bullet-dot"></span>Sistema de Reciclagem de Duplicatas</li>
+          <li class="bullet-item"><span class="bullet-dot"></span>Fundo de Acesso Universal</li>
         </ul>
       </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ── Seção 5: stats ── -->
-  <section class="section-stats">
-    <div class="stats-grid">
-      <div class="stat-cell"><p class="stat-num">—</p><p class="stat-label">[Stat 01 — descrição breve]</p></div>
-      <div class="stat-cell"><p class="stat-num">—</p><p class="stat-label">[Stat 02 — descrição breve]</p></div>
-      <div class="stat-cell"><p class="stat-num">—</p><p class="stat-label">[Stat 03 — descrição breve]</p></div>
-      <div class="stat-cell"><p class="stat-num">—</p><p class="stat-label">[Stat 04 — descrição breve]</p></div>
     </div>
   </section>
 
@@ -426,37 +415,37 @@
   <section class="section-testimonials">
     <div class="testimonials-inner">
       <div class="testimonials-header">
-        <p class="section-label">[Rótulo]</p>
-        <h2 class="section-title">[Título da seção de depoimentos]</h2>
+        <p class="section-label">Depoimentos</p>
+        <h2 class="section-title">Vocês falaram, nós escutamos</h2>
       </div>
       <div class="testimonials-grid">
         <div class="testimonial-card">
-          <p class="testimonial-quote">"[Depoimento de usuário — uma ou duas frases descrevendo a experiência com o produto.]"</p>
+          <p class="testimonial-quote">"O Editor é super intuitivo. Conseguimos combinar a resistência física da família com traços estéticos incríveis de forma simples e rápida, tudo com a certeza de que o embrião estava 100% seguro."</p>
           <div class="testimonial-author">
             <div class="testimonial-avatar"></div>
             <div>
-              <p class="testimonial-name">[Nome do usuário]</p>
-              <p class="testimonial-role">[Cargo ou contexto]</p>
+              <p class="testimonial-name">Mariana S., São Paulo</p>
+              <p class="testimonial-role">Usuária à 3 anos</p>
             </div>
           </div>
         </div>
         <div class="testimonial-card">
-          <p class="testimonial-quote">"[Depoimento de usuário — uma ou duas frases descrevendo a experiência com o produto.]"</p>
+          <p class="testimonial-quote">"Ganhamos uma otimização metabólica rara na nossa primeira cápsula. Saber que demos ao nosso filho uma vida sem predisposição a doenças hereditárias não tem preço."</p>
           <div class="testimonial-author">
             <div class="testimonial-avatar"></div>
             <div>
-              <p class="testimonial-name">[Nome do usuário]</p>
-              <p class="testimonial-role">[Cargo ou contexto]</p>
+              <p class="testimonial-name">Lucas e Gabriel T., Curitiba</p>
+              <p class="testimonial-role">Usuários Helix+</p>
             </div>
           </div>
         </div>
         <div class="testimonial-card">
-          <p class="testimonial-quote">"[Depoimento de usuário — uma ou duas frases descrevendo a experiência com o produto.]"</p>
+          <p class="testimonial-quote">"Troquei traços duplicados no Marketplace para ajustar a cor dos olhos da minha filha. O melhor foi saber que parte da transação financiou o tratamento de uma criança na rede pública."</p>
           <div class="testimonial-author">
             <div class="testimonial-avatar"></div>
             <div>
-              <p class="testimonial-name">[Nome do usuário]</p>
-              <p class="testimonial-role">[Cargo ou contexto]</p>
+              <p class="testimonial-name">Camila R., Rio de Janeiro</p>
+              <p class="testimonial-role">Usuária à 1 ano</p>
             </div>
           </div>
         </div>
@@ -474,10 +463,10 @@
     <div style="position:absolute;right:80px;top:50%;transform:translateY(-50%) scaleX(-1);pointer-events:none;">
       <svg width="44" height="260" viewBox="0 0 44 260" aria-hidden="true" style="opacity:0.13;overflow:visible;"><g id="helix-cta-r"></g></svg>
     </div>
-    <p class="section-label">[Rótulo final]</p>
-    <h2 class="cta-title">[Frase de encerramento e convite à ação]</h2>
-    <p class="cta-sub">[Texto de apoio ao CTA — breve, direto, sem jargões.]</p>
-    <a href="signup.html" class="btn-cta">[CTA final]</a>
+    <p class="section-label">Fechamento</p>
+    <h2 class="cta-title">Molde seu futuro, ainda hoje.</h2>
+    <p class="cta-sub">Explore nossa plataforma, monte seu primeiro inventário biológico e garanta a saúde e a longevidade da próxima geração com segurança e responsabilidade ética.</p>
+    <a href="signup.html" class="btn-cta">Saiba Mais</a>
   </section>
 
   <!-- ── Footer ── -->

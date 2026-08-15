@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png')}}">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -324,7 +326,7 @@
       </div>
       <div class="welcome-stat-row">
         <div class="welcome-stat">
-          <p class="welcome-stat-num">3</p>
+          <p class="welcome-stat-num">{{ capsulas_abertas }}</p>
           <p class="welcome-stat-label">Cápsulas abertas</p>
         </div>
         <div class="welcome-stat" style="border-left:1px solid var(--border);padding-left:24px;">
@@ -332,8 +334,8 @@
           <p class="welcome-stat-label">Traits ativos</p>
         </div>
         <div class="welcome-stat" style="border-left:1px solid var(--border);padding-left:24px;">
-          <p class="welcome-stat-num">1</p>
-          <p class="welcome-stat-label">Projeto salvo</p>
+          <p class="welcome-stat-num">{{ projetos_salvos }}</p>
+          <p class="welcome-stat-label">Projetos salvos</p>
         </div>
       </div>
     </div>
@@ -401,30 +403,6 @@
         </div>
       </a>
 
-    </div>
-
-
-
-
-    <!-- ── Lootbox banner ── -->
-    <div class="lootbox-banner">
-      <div class="lootbox-banner-deco">
-        <svg width="120" height="180" viewBox="0 0 120 180" aria-hidden="true">
-          <g id="deco-banner"></g>
-        </svg>
-      </div>
-      <div class="lootbox-banner-text">
-        <p class="lootbox-banner-eyebrow">Disponível agora</p>
-        <h2 class="lootbox-banner-title">Você tem 1 cápsula<br/>aguardando abertura.</h2>
-        <p class="lootbox-banner-desc">
-          A cápsula do ciclo atual expira em 6 dias.
-          Cada cápsula contém entre 3 e 7 traits únicos selecionados pelo painel científico
-          com base no seu perfil genético.
-        </p>
-      </div>
-      <div class="lootbox-banner-cta">
-        <a href="/user/{{ word }}/lootbox" class="btn-primary">Abrir agora</a>
-      </div>
     </div>
 
   </main>

@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png')}}">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -351,7 +353,7 @@
         <h1 class="page-title">Marketplace</h1>
         <p class="page-sub">Navegue por traits genéticos exclusivos e negocie com outros cientistas na plataforma.</p>
       </div>
-      <button class="btn-new-ad" id="btn-new-ad">
+      <button class="btn-new-ad" id="btn-new-ad" style="display: none;">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M7 1V13M1 7H13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>

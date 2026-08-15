@@ -132,6 +132,8 @@ def init_db():
     columns = [col[1] for col in cursor.fetchall()]
     if "creditos" not in columns:
         cursor.execute("ALTER TABLE pessoas ADD COLUMN creditos INTEGER DEFAULT 3000")
+    if "capsulas_abertas" not in columns:
+        cursor.execute("ALTER TABLE pessoas ADD COLUMN capsulas_abertas INTEGER DEFAULT 0")
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS inventario (
@@ -154,17 +156,49 @@ def init_db():
         )
     """)
 
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS projetos_salvos (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            id_usuario INTEGER NOT NULL,
+            nome_projeto TEXT NOT NULL,
+            cabelo TEXT NOT NULL,
+            pele TEXT NOT NULL,
+            olhos TEXT NOT NULL,
+            boca TEXT NOT NULL,
+            nariz TEXT NOT NULL,
+            voz TEXT NOT NULL,
+            altura TEXT NOT NULL,
+            inteligencia TEXT NOT NULL,
+            carisma TEXT NOT NULL,
+            atleticidade TEXT NOT NULL,
+            imunologico TEXT NOT NULL,
+            criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     cursor.execute("SELECT COUNT(*) FROM marketplace_items")
     if cursor.fetchone()[0] == 0:
         dados_mockados = [
             ("Dr. Arthur", "Platinado natural", "cabelo", "lendario", 1500),
             ("Dra. Elena", "Heterocromia", "olhos", "lendario", 1800),
-            ("Alex_Genetics", "Inteligência Excepcional", "inteligencia", "epico", 950),
-            ("Sérgio_V", "Sorriso excepcional", "boca", "epico", 800),
-            ("BioTrader", "Azul acinzentado", "olhos", "incomum", 300),
-            ("Luna_M", "Atleticidade Elevada", "atleticidade", "raro", 550),
-            ("Carlos_H", "Clara — textura suave", "pele", "comum", 100),
-            ("Ana_Gen", "Crespo — preto profundo", "cabelo", "incomum", 250),
+            ("BioTrader", "QI 140+ — genial", "inteligencia", "lendario", 2200),
+            ("Lab_Alpha", "Sobre-humano", "atleticidade", "lendario", 2000),
+            ("Gene_X", "Translúcida perolada", "pele", "lendario", 1700),
+            ("Dra. Elena", "Lendário — uma geração", "carisma", "lendario", 2500),
+            ("Carlos_H", "Cacheado — ruivo intenso", "cabelo", "epico", 850),
+            ("Luna_M", "Sorriso excepcional", "boca", "epico", 900),
+            ("BioTrader", "Grego esculpido", "nariz", "epico", 750),
+            ("Dr. Arthur", "Melodioso — amplo alcance", "voz", "epico", 800),
+            ("Carlos_H", "QI 130–140 — excepcional", "inteligencia", "epico", 950),
+            ("Luna_M", "Imunidade avançada", "imunologico", "epico", 1100),
+            ("Gene_X", "Excepcional — acima de 198cm", "altura", "epico", 1000),
+            ("Alex_Genetics", "Ondulado — loiro dourado", "cabelo", "raro", 550),
+            ("Carlos_H", "Ébano — profundo", "pele", "raro", 450),
+            ("Sérgio_V", "Cinza claro", "olhos", "raro", 500),
+            ("Luna_M", "Grave profundo", "voz", "raro", 600),
+            ("BioTrader", "Muito carismático — líder", "carisma", "raro", 700),
+            ("Lab_Alpha", "Excepcional — raramente adoece", "imunologico", "raro", 650),
+            ("Alex_Genetics", "Reto — fino de perfil", "nariz", "raro", 400),
         ]
         cursor.executemany(
             "INSERT INTO marketplace_items (usuario, nome, categoria, raridade, preco) VALUES (?, ?, ?, ?, ?)",
@@ -321,9 +355,15 @@ def user(word):
         
     cursor.execute("SELECT COUNT(*) FROM inventario WHERE id_usuario=?", [verificacao["id"]])
     traits_ativos = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM projetos_salvos WHERE id_usuario=?", [verificacao["id"]])
+    projetos_salvos_count = cursor.fetchone()[0]
+
+    capsulas_abertas = verificacao["capsulas_abertas"] if verificacao["capsulas_abertas"] is not None else 0
     db.close()
 
-    return render_template("dentro.html", word=word, creditos=creditos, traits_ativos=traits_ativos)
+    return render_template("dentro.html", word=word, creditos=creditos, traits_ativos=traits_ativos,
+                           capsulas_abertas=capsulas_abertas, projetos_salvos=projetos_salvos_count)
 
 
 def get_grouped_inventory(username):
@@ -363,7 +403,132 @@ def editor(word):
     
     inventory = get_grouped_inventory(word)
     creditos = get_user_credits(word)
-    return render_template("editor.html", word=word, inventory=inventory, creditos=creditos)
+
+    db, cursor = get_db()
+    cursor.execute("""
+        SELECT id, nome_projeto, cabelo, pele, olhos, boca, nariz, voz, altura, inteligencia, carisma, atleticidade, imunologico, criado_em 
+        FROM projetos_salvos 
+        WHERE id_usuario = (SELECT id FROM pessoas WHERE usuario = ?) 
+        ORDER BY id DESC
+    """, [word])
+    projects_rows = cursor.fetchall()
+    db.close()
+
+    projects = [dict(row) for row in projects_rows]
+
+    return render_template("editor.html", word=word, inventory=inventory, creditos=creditos, projects=projects)
+
+
+@app.route('/user/<word>/editor/save', methods=['POST'])
+def save_project(word):
+    if 'login' not in session or session['login'] != word:
+        return {"success": False, "message": "Não autorizado"}, 403
+
+    nome_projeto = request.form.get("nome_projeto")
+    if not nome_projeto:
+        return {"success": False, "message": "Nome do projeto faltando"}, 400
+
+    slots = ['cabelo', 'pele', 'olhos', 'boca', 'nariz', 'voz', 'altura', 'inteligencia', 'carisma', 'atleticidade', 'imunologico']
+    traits_data = {}
+    for slot in slots:
+        val = request.form.get(slot)
+        if not val:
+            return {"success": False, "message": f"Característica {slot} faltando"}, 400
+        traits_data[slot] = val
+
+    db, cursor = get_db()
+    cursor.execute("SELECT id FROM pessoas WHERE usuario=?", [word])
+    user_row = cursor.fetchone()
+    if not user_row:
+        db.close()
+        return {"success": False, "message": "Usuário não encontrado"}, 404
+    user_id = user_row["id"]
+
+    try:
+        # Verify if all selected traits exist in inventory
+        for slot, trait_name in traits_data.items():
+            cursor.execute(
+                "SELECT id FROM inventario WHERE id_usuario=? AND nome=? AND tipo=? LIMIT 1",
+                [user_id, trait_name, slot]
+            )
+            item_row = cursor.fetchone()
+            if not item_row:
+                db.close()
+                return {"success": False, "message": f"Você não possui o item '{trait_name}' no inventário."}, 400
+
+        # Remove used traits from inventory
+        for slot, trait_name in traits_data.items():
+            cursor.execute(
+                "DELETE FROM inventario WHERE id = (SELECT id FROM inventario WHERE id_usuario=? AND nome=? AND tipo=? LIMIT 1)",
+                [user_id, trait_name, slot]
+            )
+
+        # Insert project
+        cursor.execute("""
+            INSERT INTO projetos_salvos (
+                id_usuario, nome_projeto, cabelo, pele, olhos, boca, nariz, voz, altura, inteligencia, carisma, atleticidade, imunologico
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, [
+            user_id, nome_projeto,
+            traits_data['cabelo'], traits_data['pele'], traits_data['olhos'], traits_data['boca'],
+            traits_data['nariz'], traits_data['voz'], traits_data['altura'], traits_data['inteligencia'],
+            traits_data['carisma'], traits_data['atleticidade'], traits_data['imunologico']
+        ])
+
+        db.commit()
+        db.close()
+        return {"success": True, "message": "Projeto salvo com sucesso!"}
+    except Exception as e:
+        print(e)
+        db.rollback()
+        db.close()
+        return {"success": False, "message": "Erro ao salvar o projeto no banco de dados."}, 500
+
+
+@app.route('/user/<word>/editor/delete', methods=['POST'])
+def delete_project(word):
+    if 'login' not in session or session['login'] != word:
+        return {"success": False, "message": "Não autorizado"}, 403
+
+    project_id = request.form.get("project_id")
+    if not project_id:
+        return {"success": False, "message": "ID do projeto faltando"}, 400
+
+    db, cursor = get_db()
+    cursor.execute("SELECT id FROM pessoas WHERE usuario=?", [word])
+    user_row = cursor.fetchone()
+    if not user_row:
+        db.close()
+        return {"success": False, "message": "Usuário não encontrado"}, 404
+    user_id = user_row["id"]
+
+    cursor.execute("SELECT * FROM projetos_salvos WHERE id=? AND id_usuario=?", [project_id, user_id])
+    project = cursor.fetchone()
+    if not project:
+        db.close()
+        return {"success": False, "message": "Projeto não encontrado"}, 404
+
+    try:
+        slots = ['cabelo', 'pele', 'olhos', 'boca', 'nariz', 'voz', 'altura', 'inteligencia', 'carisma', 'atleticidade', 'imunologico']
+        
+        # Restore items back to inventory
+        for slot in slots:
+            cursor.execute(
+                "INSERT INTO inventario (id_usuario, nome, tipo) VALUES (?, ?, ?)",
+                [user_id, project[slot], slot]
+            )
+
+        # Delete project
+        cursor.execute("DELETE FROM projetos_salvos WHERE id=?", [project_id])
+
+        db.commit()
+        db.close()
+        return {"success": True, "message": "Projeto excluído e itens devolvidos!"}
+    except Exception as e:
+        print(e)
+        db.rollback()
+        db.close()
+        return {"success": False, "message": "Erro ao excluir projeto."}, 500
 
 
 @app.route('/user/<word>/marketplace', methods=['GET', 'POST'])
@@ -586,6 +751,7 @@ def open_lootbox(word):
 
     try:
         cursor.execute("UPDATE pessoas SET creditos = creditos - ? WHERE usuario=?", [box_cost, word])
+        cursor.execute("UPDATE pessoas SET capsulas_abertas = capsulas_abertas + 1 WHERE usuario=?", [word])
         cursor.execute(
             "INSERT INTO inventario (id_usuario, nome, tipo) VALUES ((SELECT id FROM pessoas WHERE usuario=?), ?, ?)",
             [word, item["name"], item["category"]]

@@ -7,6 +7,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='logo.png')}}">
+
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -307,6 +310,51 @@
         <button class="btn-save" id="btn-save">Salvar projeto</button>
       </div>
     </div>
+
+    <!-- ── Saved Projects Section ── -->
+    <div class="saved-projects-section" style="margin-top: 56px; border-top: 1px solid var(--border); padding-top: 48px;">
+      <h2 style="font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(22px, 2.5vw, 28px); font-weight: 400; color: var(--text); margin-bottom: 8px;">
+        Projetos Genéticos Salvos
+      </h2>
+      <p style="font-size: 14px; color: var(--muted); margin-bottom: 32px;">
+        Confira abaixo a lista de todas as configurações genéticas salvas. Ao excluir um projeto, os itens retornarão automaticamente para o seu inventário.
+      </p>
+
+      {% if not projects %}
+        <div style="background: var(--cream); border: 1.5px dashed var(--border); border-radius: 16px; padding: 48px; text-align: center;">
+          <p style="color: var(--faint); font-size: 14px; font-weight: 500;">Nenhum projeto salvo no momento.</p>
+        </div>
+      {% else %}
+        <div class="projects-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+          {% for p in projects %}
+            <div class="project-card" style="background: var(--cream); border: 1px solid var(--border); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; transition: box-shadow 0.18s; position: relative;">
+              <h3 style="font-family: 'DM Serif Display', Georgia, serif; font-size: 20px; font-weight: 400; color: var(--text); margin-bottom: 4px; padding-right: 32px;">
+                {{ p.nome_projeto }}
+              </h3>
+              <p style="font-size: 11px; color: var(--faint); margin-bottom: 20px;">Salvo em: {{ p.criado_em }}</p>
+
+              <div class="project-traits-list" style="display: grid; gap: 8px; font-size: 12px; line-height: 1.4; color: var(--muted); flex-grow: 1; margin-bottom: 24px; padding: 12px; background: rgba(0,0,0,0.02); border-radius: 8px;">
+                <div><strong>Cabelo:</strong> {{ p.cabelo }}</div>
+                <div><strong>Pele:</strong> {{ p.pele }}</div>
+                <div><strong>Olhos:</strong> {{ p.olhos }}</div>
+                <div><strong>Boca:</strong> {{ p.boca }}</div>
+                <div><strong>Nariz:</strong> {{ p.nariz }}</div>
+                <div><strong>Voz:</strong> {{ p.voz }}</div>
+                <div><strong>Altura:</strong> {{ p.altura }}</div>
+                <div><strong>Inteligência:</strong> {{ p.inteligencia }}</div>
+                <div><strong>Carisma:</strong> {{ p.carisma }}</div>
+                <div><strong>Atleticidade:</strong> {{ p.atleticidade }}</div>
+                <div><strong>Sist. Imunológico:</strong> {{ p.imunologico }}</div>
+              </div>
+
+              <button class="btn-delete-project" onclick="deleteProject({{ p.id }}, '{{ p.nome_projeto }}')" style="align-self: flex-start; background: transparent; border: 1px solid rgba(185, 28, 28, 0.2); color: #b91c1c; padding: 8px 16px; border-radius: 100px; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s;">
+                Excluir Projeto
+              </button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    </div>
   </main>
 
   <!-- ── Item picker dropdown ── -->
@@ -544,11 +592,75 @@
       updateCount()
     })
 
-    // ── Save (placeholder) ────────────────────────────────────
+    // ── Save ──────────────────────────────────────────────────
     document.getElementById('btn-save').addEventListener('click', () => {
-      // Wire to backend
-      alert('Projeto salvo! (integração pendente)')
-    })
+      const slotsCount = SLOTS.length;
+      const selectedCount = Object.keys(selected).length;
+
+      if (selectedCount < slotsCount) {
+        alert(`O projeto está incompleto. Selecione todas as 11 características antes de salvar (selecionadas: ${selectedCount} de 11).`);
+        return;
+      }
+
+      const projectName = prompt("Digite um nome para este projeto genético:");
+      if (!projectName) return;
+      if (projectName.trim() === "") {
+        alert("O nome do projeto não pode ser vazio.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('nome_projeto', projectName.trim());
+      SLOTS.forEach(slot => {
+        formData.append(slot.id, selected[slot.id].name);
+      });
+
+      fetch(`/user/{{ word }}/editor/save`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(`Projeto "${projectName}" salvo com sucesso! Os itens utilizados foram consumidos do seu inventário.`);
+          window.location.reload();
+        } else {
+          alert(data.message || 'Erro ao salvar projeto.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Erro de conexão ao salvar projeto.');
+      });
+    });
+
+    // ── Delete saved project ──────────────────────────────────
+    function deleteProject(id, name) {
+      if (!confirm(`Deseja realmente excluir o projeto "${name}"? Os itens utilizados retornarão ao seu inventário.`)) {
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('project_id', id);
+
+      fetch(`/user/{{ word }}/editor/delete`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert(`Projeto "${name}" excluído. Os itens voltaram para o seu inventário!`);
+          window.location.reload();
+        } else {
+          alert(data.message || 'Erro ao excluir projeto.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        alert('Erro de conexão ao excluir projeto.');
+      });
+    }
   </script>
 </body>
 </html>
