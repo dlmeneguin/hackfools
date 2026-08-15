@@ -284,7 +284,7 @@
 
   <!-- ── Navbar ── -->
   <header class="navbar">
-    <a href="dentro" class="navbar-logo">
+    <a href="/user/{{ word }}" class="navbar-logo">
       <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true">
         <circle cx="13" cy="13" r="12" stroke="#8fa68a" stroke-width="1.2" opacity="0.6"/>
         <circle cx="13" cy="13" r="4.5" fill="#8fa68a" opacity="0.55"/>
@@ -296,16 +296,16 @@
     </a>
 
     <nav class="navbar-nav" aria-label="Navegação principal">
-      <a href="" class="nav-link active">Início</a>
-      <a href="/marketplace" class="nav-link">Marketplace</a>
-      <a href="/editor" class="nav-link">Editor de Filho</a>
-      <a href="{{ word }}/lootbox" class="nav-link">Lootboxes</a>
+      <a href="/user/{{ word }}" class="nav-link active">Início</a>
+      <a href="/user/{{ word }}/marketplace" class="nav-link">Marketplace</a>
+      <a href="/user/{{ word }}/editor" class="nav-link">Editor de Filho</a>
+      <a href="/user/{{ word }}/lootbox" class="nav-link">Lootboxes</a>
     </nav>
 
     <div class="navbar-user">
       <span class="user-name">{{ word }}</span>
       <div class="user-avatar" title="Perfil">U</div>
-      <a href="/">
+      <a href="/logout">
         <button class="btn-logout">Sair</button>
       </a>
     </div>
@@ -340,7 +340,7 @@
     <div class="nav-cards">
 
       <!-- Marketplace -->
-      <a href="marketplace.html" class="nav-card marketplace">
+      <a href="/user/{{ word }}/marketplace" class="nav-card marketplace">
         <div>
           <p class="card-tag">Explorar</p>
           <h2 class="card-title">Marketplace</h2>
@@ -360,7 +360,7 @@
       </a>
 
       <!-- Editor de filho -->
-      <a href="editor.html" class="nav-card editor">
+      <a href="/user/{{ word }}/editor" class="nav-card editor">
         <div>
           <p class="card-tag">Criar</p>
           <h2 class="card-title">Editor<br/>de Filho</h2>
@@ -380,7 +380,7 @@
       </a>
 
       <!-- Lootboxes -->
-      <a href="{{ word }}/lootbox" class="nav-card lootbox">
+      <a href="/user/{{ word }}/lootbox" class="nav-card lootbox">
         <div>
           <p class="card-tag">Colecionar</p>
           <h2 class="card-title">Lootboxes</h2>
@@ -421,7 +421,7 @@
         </p>
       </div>
       <div class="lootbox-banner-cta">
-        <a href="{{ word }}/lootbox" class="btn-primary">Abrir agora</a>
+        <a href="/user/{{ word }}/lootbox" class="btn-primary">Abrir agora</a>
       </div>
     </div>
 

@@ -42,7 +42,7 @@ def signin():
         session['login'] = usuario
         db.commit()
         db.close()
-        return redirect(f"user/{usuario}")
+        return redirect(url_for('user', word=usuario))
     return render_template("signin.html")
 
 
@@ -58,7 +58,7 @@ def login():
         #verificação de input e db
         if usuario == '' or senha == '':
             db.close()
-            return render_template("signin.html", erro="Preencha todos os campos")
+            return render_template("login.html", erro="Preencha todos os campos")
 
         cursor.execute("SELECT * FROM pessoas WHERE usuario=? AND senha=?", [usuario, senha])
         verificacao = cursor.fetchone()
@@ -71,31 +71,57 @@ def login():
         # faz login
         db.close()
         session['login'] = usuario
-        return redirect(f"user/{usuario}")
+        return redirect(url_for('user', word=usuario))
 
     return render_template("login.html")
 
 
 @app.route('/user/<word>', methods=['GET', 'POST'])
 def user(word):
-        db, cursor = get_db()
-        cursor.execute("SELECT * FROM pessoas WHERE usuario=?", [word])
-        verificacao = cursor.fetchone()
-        if verificacao == None:
-            db.close()
-            return redirect("/")
-        try:
-            temp = session['login']
-        except:
-            db.close()
-            flash("Favor realize o log-in")
-            return redirect(url_for('login'))
-        if session['login'] == word:
-            db.close()
-            return render_template("dentro.html", word=word)
+    if 'login' not in session:
+        flash("Favor realize o log-in")
+        return redirect(url_for('login'))
+    if session['login'] != word:
+        return redirect(url_for('user', word=session['login']))
+
+    db, cursor = get_db()
+    cursor.execute("SELECT * FROM pessoas WHERE usuario=?", [word])
+    verificacao = cursor.fetchone()
+    db.close()
+    if verificacao == None:
+        session.clear()
+        return redirect(url_for('login'))
+
+    return render_template("dentro.html", word=word)
+
+
+@app.route('/user/<word>/editor', methods=['GET', 'POST'])
+def editor(word):
+    if 'login' not in session:
+        flash("Favor realize o log-in")
+        return redirect(url_for('login'))
+    if session['login'] != word:
+        return redirect(url_for('editor', word=session['login']))
+    return render_template("editor.html", word=word)
+
+
+@app.route('/user/<word>/marketplace', methods=['GET', 'POST'])
+def marketplace(word):
+    if 'login' not in session:
+        flash("Favor realize o log-in")
+        return redirect(url_for('login'))
+    if session['login'] != word:
+        return redirect(url_for('marketplace', word=session['login']))
+    return render_template("marketplace.html", word=word)
+
 
 @app.route('/user/<word>/lootbox', methods=['GET', 'POST'])
 def lootboxes(word):
+    if 'login' not in session:
+        flash("Favor realize o log-in")
+        return redirect(url_for('login'))
+    if session['login'] != word:
+        return redirect(url_for('lootboxes', word=session['login']))
     return render_template("lootbox.html", word=word)
 
 

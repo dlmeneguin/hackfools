@@ -58,6 +58,7 @@
     .nav-link:hover { background: var(--bg-card); color: var(--text); }
     .nav-link.active { background: var(--sage-soft); color: var(--text); font-weight: 500; }
     .navbar-user { display: flex; align-items: center; gap: 10px; }
+    .user-name { font-size: 13px; color: var(--muted); }
     .user-avatar {
       width: 34px; height: 34px; border-radius: 50%;
       background: var(--sage-soft); border: 1.5px solid var(--border-mid);
@@ -302,13 +303,14 @@
     </a>
     <nav class="navbar-nav">
       <a href="/user/{{ word }}" class="nav-link">Início</a>
-      <a href="marketplace" class="nav-link">Marketplace</a>
-      <a href="editor" class="nav-link">Editor de Filho</a>
-      <a href="" class="nav-link active">Lootboxes</a>
+      <a href="/user/{{ word }}/marketplace" class="nav-link">Marketplace</a>
+      <a href="/user/{{ word }}/editor" class="nav-link">Editor de Filho</a>
+      <a href="/user/{{ word }}/lootbox" class="nav-link active">Lootboxes</a>
     </nav>
     <div class="navbar-user">
+      <span class="user-name">{{ word }}</span>
       <div class="user-avatar">U</div>
-      <a href="/"><button class="btn-logout">Sair</button></a>
+      <a href="/logout"><button class="btn-logout">Sair</button></a>
     </div>
   </header>
 

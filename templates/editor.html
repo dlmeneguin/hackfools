@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Editor de Filho — Helix</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #f5f0e8; color: #2c2520;
+      font-family: 'Outfit', system-ui, sans-serif;
+      -webkit-font-smoothing: antialiased; min-height: 100vh;
+    }
+    a { text-decoration: none; color: inherit; }
+    :root {
+      --bg: #f5f0e8; --bg-alt: #ede7d9; --bg-card: #ece5d5; --cream: #faf7f2;
+      --border: rgba(160,140,110,0.22); --border-mid: rgba(160,140,110,0.4);
+      --text: #2c2520; --muted: #8c7d6a; --faint: #b5a898;
+      --sage: #8fa68a; --sage-dark: #7aab78; --sage-soft: rgba(143,166,138,0.15);
+      --blush: #c4a99a;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(160,140,110,0.3); border-radius: 2px; }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: sticky; top: 0; z-index: 40;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 64px;
+      background: rgba(245,240,232,0.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar-logo { display: flex; align-items: center; gap: 10px; font-family: 'DM Serif Display', Georgia, serif; font-style: italic; font-size: 20px; letter-spacing: 0.1em; font-weight: 400; }
+    .navbar-nav { display: flex; align-items: center; gap: 6px; }
+    .nav-link { padding: 6px 16px; border-radius: 100px; font-size: 13px; color: var(--muted); transition: all 0.18s; white-space: nowrap; }
+    .nav-link:hover { background: var(--bg-card); color: var(--text); }
+    .nav-link.active { background: var(--sage-soft); color: var(--text); font-weight: 500; }
+    .navbar-user { display: flex; align-items: center; gap: 10px; }
+    .user-name { font-size: 13px; color: var(--muted); }
+    .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--sage-soft); border: 1.5px solid var(--border-mid); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; color: var(--sage-dark); }
+    .btn-logout { padding: 6px 14px; border-radius: 100px; font-size: 12px; color: var(--faint); border: 1px solid var(--border); background: transparent; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.18s; }
+    .btn-logout:hover { color: var(--muted); }
+
+    /* ── Page ── */
+    .page { max-width: 1140px; margin: 0 auto; padding: 48px 48px 80px; }
+    .page-header { margin-bottom: 40px; }
+    .page-eyebrow { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--faint); margin-bottom: 8px; }
+    .page-title { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(26px, 4vw, 44px); font-weight: 400; color: var(--text); line-height: 1.05; margin-bottom: 10px; }
+    .page-sub { font-size: 14px; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 520px; }
+
+    /* ── Editor canvas ── */
+    .editor-wrap {
+      overflow-x: auto;
+      overflow-y: visible;
+      padding-bottom: 16px;
+    }
+    .editor-canvas {
+      position: relative;
+      width: 1040px;
+      height: 660px;
+      margin: 0 auto;
+    }
+
+    /* ── SVG overlay (lines) ── */
+    .lines-svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* ── Body figure ── */
+    .body-figure {
+      position: absolute;
+      left: 430px;
+      top: 50px;
+      width: 180px;
+      height: 460px;
+      z-index: 2;
+    }
+
+    /* ── Slot box ── */
+    .slot {
+      position: absolute;
+      width: 176px;
+      min-height: 56px;
+      border-radius: 12px;
+      border: 1.5px dashed var(--border-mid);
+      background: var(--cream);
+      cursor: pointer;
+      z-index: 3;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.18s;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 10px 14px;
+      user-select: none;
+    }
+    .slot:hover {
+      border-color: var(--sage);
+      box-shadow: 0 4px 18px rgba(44,37,32,0.08);
+      transform: translateY(-1px);
+    }
+    .slot.filled {
+      border-style: solid;
+      border-color: var(--sage);
+      background: rgba(143,166,138,0.08);
+    }
+    .slot-label {
+      font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--faint); margin-bottom: 4px;
+    }
+    .slot-empty-text {
+      font-size: 12px; color: var(--faint); font-style: italic;
+    }
+    .slot-item-name {
+      font-size: 12px; color: var(--text); font-weight: 500; line-height: 1.4;
+    }
+    .slot-item-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 3px;
+    }
+    .slot-rarity {
+      font-size: 10px; color: var(--sage-dark); letter-spacing: 0.06em;
+    }
+    .slot-clear {
+      background: none; border: none; cursor: pointer;
+      color: var(--faint); font-size: 16px; line-height: 1; padding: 0;
+      flex-shrink: 0; transition: color 0.15s;
+    }
+    .slot-clear:hover { color: var(--text); }
+
+    /* Dot on body attachment point */
+    .body-dot {
+      fill: var(--sage);
+      opacity: 0.7;
+    }
+
+    /* ── Item picker dropdown ── */
+    .picker {
+      display: none;
+      position: fixed;
+      z-index: 200;
+      width: 240px;
+      background: var(--cream);
+      border-radius: 16px;
+      border: 1px solid var(--border-mid);
+      box-shadow: 0 16px 48px rgba(44,37,32,0.14), 0 4px 12px rgba(44,37,32,0.06);
+      overflow: hidden;
+    }
+    .picker.open { display: block; }
+    .picker-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .picker-title {
+      font-family: 'DM Serif Display', Georgia, serif;
+      font-size: 16px; font-weight: 400; color: var(--text);
+    }
+    .picker-close {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-size: 18px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s; font-family: sans-serif;
+    }
+    .picker-close:hover { background: var(--bg-card); color: var(--text); }
+    .picker-list { list-style: none; padding: 8px 0; max-height: 240px; overflow-y: auto; }
+    .picker-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; cursor: pointer; transition: background 0.15s;
+      gap: 8px;
+    }
+    .picker-item:hover { background: var(--bg-alt); }
+    .picker-item-name { font-size: 12px; color: var(--text); line-height: 1.4; flex: 1; }
+    .rarity-pip {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .rarity-comum    { background: var(--faint); }
+    .rarity-incomum  { background: var(--sage); }
+    .rarity-raro     { background: var(--blush); }
+    .rarity-epico    { background: #a98bd4; }
+    .rarity-lendario { background: #c4a55a; }
+    .picker-empty {
+      padding: 20px 16px; font-size: 12px; color: var(--faint);
+      font-style: italic; text-align: center;
+    }
+
+    /* ── Save bar ── */
+    .save-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 32px; padding: 20px 28px;
+      background: var(--cream); border-radius: 16px; border: 1px solid var(--border);
+      flex-wrap: wrap; gap: 16px;
+    }
+    .save-bar-info { font-size: 13px; color: var(--muted); }
+    .save-bar-info strong { color: var(--text); }
+    .save-bar-actions { display: flex; gap: 10px; }
+    .btn-save {
+      padding: 10px 24px; border-radius: 100px; border: none;
+      background: var(--sage); color: var(--cream);
+      font-size: 13px; font-family: 'Outfit', sans-serif; font-weight: 500;
+      cursor: pointer; transition: all 0.2s;
+      box-shadow: 0 3px 12px rgba(143,166,138,0.28);
+    }
+    .btn-save:hover { background: var(--sage-dark); transform: translateY(-1px); }
+    .btn-clear-all {
+      padding: 10px 20px; border-radius: 100px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); font-size: 13px; font-family: 'Outfit', sans-serif;
+      cursor: pointer; transition: all 0.18s;
+    }
+    .btn-clear-all:hover { border-color: var(--border-mid); color: var(--text); }
+
+    @media (max-width: 900px) {
+      .navbar { padding: 0 20px; }
+      .navbar-nav { display: none; }
+      .page { padding: 36px 20px 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── Navbar ── -->
+  <header class="navbar">
+    <a href="/user/{{ word }}" class="navbar-logo">
+      <svg width="24" height="24" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+        <circle cx="13" cy="13" r="12" stroke="#8fa68a" stroke-width="1.2" opacity="0.6"/>
+        <circle cx="13" cy="13" r="4.5" fill="#8fa68a" opacity="0.55"/>
+        <circle cx="13" cy="13" r="8" stroke="#8fa68a" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.4"/>
+        <circle cx="7" cy="7.5" r="1.8" fill="#c4a99a" opacity="0.7"/>
+        <circle cx="19" cy="18.5" r="1.8" fill="#8fa68a" opacity="0.7"/>
+      </svg>
+      Helix
+    </a>
+    <nav class="navbar-nav">
+      <a href="/user/{{ word }}" class="nav-link">Início</a>
+      <a href="/user/{{ word }}/marketplace" class="nav-link">Marketplace</a>
+      <a href="/user/{{ word }}/editor" class="nav-link active">Editor de Filho</a>
+      <a href="/user/{{ word }}/lootbox" class="nav-link">Lootboxes</a>
+    </nav>
+    <div class="navbar-user">
+      <span class="user-name">{{ word }}</span>
+      <div class="user-avatar">U</div>
+      <a href="/logout"><button class="btn-logout">Sair</button></a>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="page-header">
+      <p class="page-eyebrow">Criar</p>
+      <h1 class="page-title">Editor de Filho</h1>
+      <p class="page-sub">Clique em cada caixa para selecionar um item do seu inventário para aquela característica.</p>
+    </div>
+
+    <!-- ── Editor canvas ── -->
+    <div class="editor-wrap">
+      <div class="editor-canvas" id="canvas">
+
+        <!-- Lines SVG overlay -->
+        <svg class="lines-svg" id="lines-svg" xmlns="http://www.w3.org/2000/svg"></svg>
+
+        <!-- Body silhouette -->
+        <div class="body-figure">
+          <svg viewBox="0 0 180 460" fill="none" xmlns="http://www.w3.org/2000/svg" width="180" height="460">
+            <!-- Head -->
+            <ellipse cx="90" cy="44" rx="34" ry="40"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4"/>
+            <!-- Neck -->
+            <path d="M78,81 L102,81 L104,108 L76,108 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Torso (incl. shoulder area) -->
+            <path d="M76,108 C76,108 40,112 26,138 L20,158 L18,272 Q18,338 42,342 L138,342 Q162,338 162,272 L160,158 L154,138 C140,112 104,108 104,108 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Left arm -->
+            <path d="M26,138 C10,155 4,194 2,264 L2,300 Q2,314 14,316 L34,316 Q44,314 44,300 L42,240 L40,170 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Right arm -->
+            <path d="M154,138 C170,155 176,194 178,264 L178,300 Q178,314 166,316 L146,316 Q136,314 136,300 L138,240 L140,170 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Left leg -->
+            <path d="M42,342 L38,448 Q38,458 50,458 L82,458 Q90,458 90,448 L90,342 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+            <!-- Right leg -->
+            <path d="M138,342 L142,448 Q142,458 130,458 L98,458 Q90,458 90,448 L90,342 Z"
+              fill="rgba(143,166,138,0.12)" stroke="rgba(143,166,138,0.5)" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
+        <!-- ── Slots will be injected by JS ── -->
+
+      </div>
+    </div>
+
+    <!-- ── Save bar ── -->
+    <div class="save-bar">
+      <p class="save-bar-info">
+        <strong id="filled-count">0</strong> de 11 características selecionadas
+      </p>
+      <div class="save-bar-actions">
+        <button class="btn-clear-all" id="btn-clear-all">Limpar tudo</button>
+        <button class="btn-save" id="btn-save">Salvar projeto</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Item picker dropdown ── -->
+  <div class="picker" id="picker" role="listbox">
+    <div class="picker-header">
+      <span class="picker-title" id="picker-title"></span>
+      <button class="picker-close" id="picker-close" aria-label="Fechar">×</button>
+    </div>
+    <ul class="picker-list" id="picker-list"></ul>
+  </div>
+
+  <script>
+    // ── Canvas layout constants ───────────────────────────────
+    // Body SVG: left=430, top=50, width=180, height=460
+    // Body center x in canvas = 430 + 90 = 520
+
+    // Slots definition: id, label, boxLeft, boxTop, bodyX, bodyY, side ('left'|'right'|'bottom')
+    const SLOTS = [
+      // LEFT COLUMN — right edge = 20+176 = 196, connects from (196, cy) to body
+      { id:'inteligencia',  label:'Inteligência',        boxLeft:20,  boxTop:50,  bodyX:520, bodyY:100, side:'left'  },
+      { id:'olhos',         label:'Olhos',               boxLeft:20,  boxTop:160, bodyX:504, bodyY:118, side:'left'  },
+      { id:'nariz',         label:'Nariz',               boxLeft:20,  boxTop:270, bodyX:520, bodyY:138, side:'left'  },
+      { id:'boca',          label:'Boca',                boxLeft:20,  boxTop:380, bodyX:520, bodyY:156, side:'left'  },
+      { id:'voz',           label:'Voz',                 boxLeft:20,  boxTop:490, bodyX:520, bodyY:174, side:'left'  },
+      // RIGHT COLUMN — left edge = 844, connects from (844, cy) to body
+      { id:'cabelo',        label:'Cabelo',              boxLeft:844, boxTop:50,  bodyX:520, bodyY:66,  side:'right' },
+      { id:'pele',          label:'Pele',                boxLeft:844, boxTop:160, bodyX:600, bodyY:206, side:'right' },
+      { id:'carisma',       label:'Carisma',             boxLeft:844, boxTop:270, bodyX:520, bodyY:248, side:'right' },
+      { id:'atleticidade',  label:'Atleticidade',        boxLeft:844, boxTop:380, bodyX:440, bodyY:258, side:'right' },
+      { id:'imunologico',   label:'Sist. Imunológico',   boxLeft:844, boxTop:490, bodyX:520, bodyY:332, side:'right' },
+      // BOTTOM
+      { id:'altura',        label:'Altura',              boxLeft:432, boxTop:580, bodyX:520, bodyY:508, side:'bottom'},
+    ]
+
+    // ── User inventory (mock — items won from lootboxes) ─────
+    const INVENTORY = {
+      cabelo:       [
+        { name:'Ondulado — loiro dourado',  rarity:'raro' },
+        { name:'Cacheado — ruivo intenso',  rarity:'epico' },
+        { name:'Platinado natural',          rarity:'lendario' },
+      ],
+      pele:         [
+        { name:'Oliva — luminosa',           rarity:'incomum' },
+        { name:'Ébano — profundo',           rarity:'raro' },
+      ],
+      olhos:        [
+        { name:'Verde musgo',                rarity:'incomum' },
+        { name:'Cinza claro',                rarity:'raro' },
+        { name:'Âmbar',                      rarity:'epico' },
+      ],
+      boca:         [
+        { name:'Lábios carnudos — naturais', rarity:'incomum' },
+        { name:'Sorriso excepcional',        rarity:'epico' },
+      ],
+      nariz:        [
+        { name:'Reto — fino de perfil',      rarity:'raro' },
+        { name:'Grego esculpido',            rarity:'epico' },
+      ],
+      voz:          [
+        { name:'Grave profundo',             rarity:'raro' },
+        { name:'Melodioso — amplo alcance',  rarity:'epico' },
+      ],
+      altura:       [
+        { name:'Média-alta — 180 a 190cm',   rarity:'incomum' },
+        { name:'Alta — 190 a 198cm',         rarity:'raro' },
+      ],
+      inteligencia: [
+        { name:'QI 120–130 — muito alto',    rarity:'raro' },
+        { name:'QI 130–140 — excepcional',   rarity:'epico' },
+      ],
+      carisma:      [
+        { name:'Muito carismático — líder',  rarity:'raro' },
+        { name:'Magnético — irresistível',   rarity:'epico' },
+      ],
+      atleticidade: [
+        { name:'Muito atlético — destacado', rarity:'raro' },
+        { name:'Elite — nível competitivo',  rarity:'epico' },
+      ],
+      imunologico:  [
+        { name:'Excepcional — raramente adoece', rarity:'raro' },
+        { name:'Imunidade avançada',         rarity:'epico' },
+      ],
+    }
+
+    const RARITY_LABEL = { comum:'Comum', incomum:'Incomum', raro:'Raro', epico:'Épico', lendario:'Lendário' }
+
+    // ── State ─────────────────────────────────────────────────
+    const selected = {}  // { slotId: { name, rarity } }
+
+    // ── Build slots ───────────────────────────────────────────
+    const canvas  = document.getElementById('canvas')
+    const linesSvg = document.getElementById('lines-svg')
+
+    SLOTS.forEach(slot => {
+      const div = document.createElement('div')
+      div.className = 'slot'
+      div.id = `slot-${slot.id}`
+      div.style.left = slot.boxLeft + 'px'
+      div.style.top  = slot.boxTop  + 'px'
+      div.setAttribute('role', 'button')
+      div.setAttribute('tabindex', '0')
+      div.setAttribute('data-id', slot.id)
+      div.setAttribute('aria-label', `Selecionar ${slot.label}`)
+      renderSlot(div, slot)
+
+      div.addEventListener('click', e => {
+        if (e.target.classList.contains('slot-clear')) return
+        openPicker(slot, div)
+      })
+      div.addEventListener('keydown', e => {
+        if ((e.key === 'Enter' || e.key === ' ') && !e.target.classList.contains('slot-clear')) openPicker(slot, div)
+      })
+      canvas.appendChild(div)
+    })
+
+    function renderSlot(div, slot) {
+      const item = selected[slot.id]
+      div.classList.toggle('filled', !!item)
+      if (item) {
+        div.innerHTML = `
+          <span class="slot-label">${slot.label}</span>
+          <div class="slot-item-row">
+            <span class="slot-item-name">${item.name}</span>
+            <button class="slot-clear" data-id="${slot.id}" title="Remover">×</button>
+          </div>
+          <span class="slot-rarity">${RARITY_LABEL[item.rarity]}</span>
+        `
+        div.querySelector('.slot-clear').addEventListener('click', e => {
+          e.stopPropagation()
+          delete selected[slot.id]
+          renderSlot(div, slot)
+          updateLines()
+          updateCount()
+        })
+      } else {
+        div.innerHTML = `
+          <span class="slot-label">${slot.label}</span>
+          <span class="slot-empty-text">+ Selecionar</span>
+        `
+      }
+    }
+
+    // ── Draw connector lines ──────────────────────────────────
+    function updateLines() {
+      linesSvg.innerHTML = ''
+      const BOX_W = 176, BOX_H = 56
+
+      SLOTS.forEach(slot => {
+        const div = document.getElementById(`slot-${slot.id}`)
+        const isFilled = !!selected[slot.id]
+        const color = isFilled ? 'rgba(122,171,120,0.7)' : 'rgba(160,140,110,0.28)'
+        const strokeW = isFilled ? 1.5 : 1
+
+        // Box connection point
+        let bx, by
+        if (slot.side === 'left')   { bx = slot.boxLeft + BOX_W; by = slot.boxTop + BOX_H / 2 }
+        if (slot.side === 'right')  { bx = slot.boxLeft;          by = slot.boxTop + BOX_H / 2 }
+        if (slot.side === 'bottom') { bx = slot.boxLeft + BOX_W / 2; by = slot.boxTop }
+
+        // Body dot
+        const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle')
+        dot.setAttribute('cx', slot.bodyX)
+        dot.setAttribute('cy', slot.bodyY)
+        dot.setAttribute('r', isFilled ? 4 : 3)
+        dot.setAttribute('fill', isFilled ? 'rgba(122,171,120,0.85)' : 'rgba(160,140,110,0.35)')
+        linesSvg.appendChild(dot)
+
+        // Line
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+        line.setAttribute('x1', bx)
+        line.setAttribute('y1', by)
+        line.setAttribute('x2', slot.bodyX)
+        line.setAttribute('y2', slot.bodyY)
+        line.setAttribute('stroke', color)
+        line.setAttribute('stroke-width', strokeW)
+        line.setAttribute('stroke-linecap', 'round')
+        if (!isFilled) line.setAttribute('stroke-dasharray', '4 4')
+        linesSvg.appendChild(line)
+      })
+    }
+
+    updateLines()
+
+    // ── Filled count ──────────────────────────────────────────
+    function updateCount() {
+      document.getElementById('filled-count').textContent = Object.keys(selected).length
+    }
+
+    // ── Item picker ───────────────────────────────────────────
+    const picker     = document.getElementById('picker')
+    const pickerTitle = document.getElementById('picker-title')
+    const pickerList  = document.getElementById('picker-list')
+    const pickerClose = document.getElementById('picker-close')
+    let   currentSlot = null
+
+    function openPicker(slot, boxEl) {
+      currentSlot = slot
+      pickerTitle.textContent = slot.label
+      pickerList.innerHTML = ''
+
+      const items = INVENTORY[slot.id] || []
+      if (items.length === 0) {
+        const empty = document.createElement('li')
+        empty.className = 'picker-empty'
+        empty.textContent = 'Nenhum item no inventário.'
+        pickerList.appendChild(empty)
+      } else {
+        items.forEach(item => {
+          const li = document.createElement('li')
+          li.className = 'picker-item'
+          li.setAttribute('role', 'option')
+          li.innerHTML = `
+            <span class="picker-item-name">${item.name}</span>
+            <span class="rarity-pip rarity-${item.rarity}" title="${RARITY_LABEL[item.rarity]}"></span>
+          `
+          li.addEventListener('click', () => {
+            selected[slot.id] = item
+            const div = document.getElementById(`slot-${slot.id}`)
+            renderSlot(div, slot)
+            updateLines()
+            updateCount()
+            closePicker()
+          })
+          pickerList.appendChild(li)
+        })
+      }
+
+      // Position near box
+      const rect = boxEl.getBoundingClientRect()
+      const pickerW = 240, pickerPad = 8
+
+      let top, left
+      if (slot.side === 'left') {
+        left = rect.right + pickerPad
+        top  = rect.top
+      } else if (slot.side === 'right') {
+        left = rect.left - pickerW - pickerPad
+        top  = rect.top
+      } else {
+        left = rect.left + rect.width / 2 - pickerW / 2
+        top  = rect.top - pickerPad - 10  // will be adjusted after open
+      }
+
+      // Clamp to viewport
+      left = Math.max(8, Math.min(left, window.innerWidth - pickerW - 8))
+
+      picker.style.left = left + 'px'
+      picker.style.top  = top  + 'px'
+      picker.classList.add('open')
+
+      // After opening, adjust if overflows bottom
+      requestAnimationFrame(() => {
+        const ph = picker.offsetHeight
+        if (top + ph > window.innerHeight - 8) {
+          picker.style.top = Math.max(8, window.innerHeight - ph - 8) + 'px'
+        }
+        if (slot.side === 'bottom') {
+          picker.style.top = (rect.top - ph - pickerPad) + 'px'
+        }
+      })
+    }
+
+    function closePicker() {
+      picker.classList.remove('open')
+      currentSlot = null
+    }
+
+    pickerClose.addEventListener('click', closePicker)
+    document.addEventListener('click', e => {
+      if (!picker.contains(e.target) && !e.target.closest('.slot')) closePicker()
+    })
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closePicker() })
+
+    // ── Clear all ─────────────────────────────────────────────
+    document.getElementById('btn-clear-all').addEventListener('click', () => {
+      for (const k in selected) delete selected[k]
+      SLOTS.forEach(slot => {
+        const div = document.getElementById(`slot-${slot.id}`)
+        renderSlot(div, slot)
+      })
+      updateLines()
+      updateCount()
+    })
+
+    // ── Save (placeholder) ────────────────────────────────────
+    document.getElementById('btn-save').addEventListener('click', () => {
+      // Wire to backend
+      alert('Projeto salvo! (integração pendente)')
+    })
+  </script>
+</body>
+</html>
