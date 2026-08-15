@@ -329,7 +329,7 @@
       <a href="/user/{{ word }}" class="nav-link">Início</a>
       <a href="/user/{{ word }}/marketplace" class="nav-link active">Marketplace</a>
       <a href="/user/{{ word }}/editor" class="nav-link">Editor de Filho</a>
-      <a href="/user/{{ word }}/lootbox" class="nav-link">Lootboxes</a>
+      <a href="/user/{{ word }}/lootbox" class="nav-link">Cápsulas</a>
     </nav>
 
     <div class="navbar-user">
@@ -389,23 +389,37 @@
         <button class="modal-close" id="modal-close">×</button>
       </div>
       <div class="modal-body">
-        <form id="create-ad-form">
+        <form id="create-ad-form" method="POST" action="/user/{{ word }}/perfil">
+          <input type="hidden" name="nome" id="form-nome" />
+          <input type="hidden" name="categoria" id="form-categoria" />
+          <input type="hidden" name="raridade" id="form-raridade" />
+
           <div class="form-group">
             <label class="form-label" for="item-select">Selecionar do Inventário</label>
             <select class="form-select" id="item-select" required>
               <option value="" disabled selected>Escolha um item...</option>
-              <option value="cabelo-platinado" data-cat="Cabelo" data-rarity="lendario">Platinado natural (Lendário)</option>
-              <option value="olhos-heterocromia" data-cat="Olhos" data-rarity="lendario">Heterocromia (Lendário)</option>
-              <option value="inteligencia-excepcional" data-cat="Inteligência" data-rarity="epico">Inteligência Superior (Épico)</option>
-              <option value="atleticidade-avancada" data-cat="Atleticidade" data-rarity="raro">Atleticidade Elevada (Raro)</option>
-              <option value="pele-ebano" data-cat="Pele" data-rarity="raro">Ébano profundo (Raro)</option>
-              <option value="pele-oliva" data-cat="Pele" data-rarity="incomum">Oliva luminosa (Incomum)</option>
+              {% for item in inventory %}
+                <option value="{{ item.name }}" data-cat="{{ item.category }}" data-rarity="{{ item.rarity }}">
+                  {{ item.name }} ({{ item.category }} — {{ item.rarity | capitalize }})
+                </option>
+              {% endfor %}
             </select>
           </div>
+
           <div class="form-group">
-            <label class="form-label" for="item-price">Preço (Créditos CR)</label>
-            <input class="form-input" type="number" id="item-price" min="10" placeholder="Ex: 500" required />
+            <label class="form-label" for="price-buyer">Valor Pago pelo Comprador (CR)</label>
+            <input class="form-input" type="number" name="preco" id="price-buyer" min="10" placeholder="Ex: 500" required />
           </div>
+
+          <div class="form-group">
+            <label class="form-label" for="price-seller">Valor que você irá receber (CR)</label>
+            <input class="form-input" type="number" id="price-seller" min="9" placeholder="Ex: 475" required />
+          </div>
+
+          <p class="fee-disclaimer" style="font-size: 11px; color: var(--muted); margin: -10px 0 15px;">
+            * A Helix retém uma taxa administrativa de <strong>5%</strong> por transação.
+          </p>
+
           <button type="submit" class="btn-submit">Publicar Anúncio</button>
         </form>
       </div>
@@ -421,7 +435,7 @@
   <div id="marketplace-user" data-user="{{ word }}" hidden></div>
 
   <script>
-    const LISTINGS = {{ listings | tojson | safe }};
+    let LISTINGS = {{ listings | tojson | safe }};
 
     const rarityLabels = {
       comum: 'Comum',
@@ -555,7 +569,15 @@
     const btnCloseModal = document.getElementById('modal-close');
     const createAdForm = document.getElementById('create-ad-form');
     const itemSelect = document.getElementById('item-select');
-    const itemPrice = document.getElementById('item-price');
+
+    // Hidden inputs
+    const formNome = document.getElementById('form-nome');
+    const formCategoria = document.getElementById('form-categoria');
+    const formRaridade = document.getElementById('form-raridade');
+
+    // Price inputs
+    const priceBuyer = document.getElementById('price-buyer');
+    const priceSeller = document.getElementById('price-seller');
 
     btnNewAd.addEventListener('click', () => overlay.classList.add('open'));
     btnCloseModal.addEventListener('click', () => {
@@ -571,33 +593,31 @@
       }
     });
 
-    // Submit new ad
-    createAdForm.addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Populate hidden inputs on item select change
+    itemSelect.addEventListener('change', () => {
       const selectedOption = itemSelect.options[itemSelect.selectedIndex];
-      if (!selectedOption.value) return;
+      formNome.value = selectedOption.value;
+      formCategoria.value = selectedOption.getAttribute('data-cat');
+      formRaridade.value = selectedOption.getAttribute('data-rarity');
+    });
 
-      const name = selectedOption.text.split(' (')[0];
-      const category = selectedOption.getAttribute('data-cat');
-      const rarity = selectedOption.getAttribute('data-rarity');
-      const price = parseInt(itemPrice.value);
+    // Link price calculations
+    priceBuyer.addEventListener('input', () => {
+      const buyer = parseFloat(priceBuyer.value);
+      if (!isNaN(buyer)) {
+        priceSeller.value = Math.floor(buyer * 0.95);
+      } else {
+        priceSeller.value = '';
+      }
+    });
 
-      const newId = LISTINGS.length ? Math.max(...LISTINGS.map(l => l.id)) + 1 : 1;
-      const seller = document.getElementById('marketplace-user').dataset.user;
-      const newAd = {
-        id: newId,
-        name: name,
-        category: category,
-        rarity: rarity,
-        seller: seller,
-        price: price
-      };
-
-      LISTINGS.unshift(newAd);
-      overlay.classList.remove('open');
-      createAdForm.reset();
-      showToast(`Anúncio de "${name}" criado com sucesso!`);
-      renderListings();
+    priceSeller.addEventListener('input', () => {
+      const seller = parseFloat(priceSeller.value);
+      if (!isNaN(seller)) {
+        priceBuyer.value = Math.ceil(seller / 0.95);
+      } else {
+        priceBuyer.value = '';
+      }
     });
 
     // Initial render

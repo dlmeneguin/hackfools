@@ -605,6 +605,38 @@ def open_lootbox(word):
         return {"success": False, "message": "Erro ao processar abertura"}, 500
 
 
+@app.route('/injecao', methods=['GET', 'POST'])
+def injecao():
+    usuario = request.args.get('usuario')
+    quantidade = request.args.get('quantidade')
+
+    if not usuario or not quantidade:
+        return "Uso correto: /injecao?usuario=NOME&quantidade=VALOR", 400
+
+    try:
+        quantidade_int = int(quantidade)
+    except ValueError:
+        return "Quantidade deve ser um número inteiro.", 400
+
+    db, cursor = get_db()
+    cursor.execute("SELECT id FROM pessoas WHERE usuario=?", [usuario])
+    user_row = cursor.fetchone()
+    if not user_row:
+        db.close()
+        return f"Usuário '{usuario}' não encontrado.", 404
+
+    try:
+        cursor.execute("UPDATE pessoas SET creditos = creditos + ? WHERE usuario=?", [quantidade_int, usuario])
+        db.commit()
+        db.close()
+        return f"Sucesso! Injetados {quantidade_int} CR na conta de '{usuario}'."
+    except Exception as e:
+        print(e)
+        if 'db' in locals():
+            db.close()
+        return "Erro interno ao processar injeção de créditos.", 500
+
+
 @app.route("/logout")
 def logout():
     db, cursor = get_db()

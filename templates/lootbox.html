@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lootboxes — Helix</title>
+  <title>Cápsulas — Helix</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
@@ -388,10 +388,10 @@
       <a href="/user/{{ word }}" class="nav-link">Início</a>
       <a href="/user/{{ word }}/marketplace" class="nav-link">Marketplace</a>
       <a href="/user/{{ word }}/editor" class="nav-link">Editor de Filho</a>
-      <a href="/user/{{ word }}/lootbox" class="nav-link active">Lootboxes</a>
+      <a href="/user/{{ word }}/lootbox" class="nav-link active">Cápsulas</a>
     </nav>
     <div class="navbar-user">
-      <span class="user-name">{{ word }}</span>
+      <span class="user-name">{{ word }} (${{ creditos }} CR)</span>
       <a href="/user/{{ word }}/perfil">
         <div class="user-avatar" title="Perfil">U</div>
       </a>
@@ -402,7 +402,7 @@
   <!-- ── Page ── -->
   <main class="page">
     <p class="page-eyebrow">Colecionar</p>
-    <h1 class="page-title">Lootboxes</h1>
+    <h1 class="page-title">Cápsulas</h1>
     <p class="page-sub">Cada cápsula corresponde a uma característica genética. Clique para ver os itens possíveis e suas probabilidades antes de abrir.</p>
 
     <!-- ── Cosméticos ── -->
@@ -719,7 +719,7 @@
         card.className = 'lootbox-card'
         card.setAttribute('role', 'button')
         card.setAttribute('tabindex', '0')
-        card.setAttribute('aria-label', `Abrir lootbox ${box.name}`)
+        card.setAttribute('aria-label', `Abrir cápsula ${box.name}`)
 
         const visual = document.createElement('div')
         visual.className = `card-visual ${type}`
