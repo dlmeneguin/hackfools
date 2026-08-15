@@ -243,7 +243,7 @@
       <a href="/user/{{ word }}/lootbox" class="nav-link">Lootboxes</a>
     </nav>
     <div class="navbar-user">
-      <span class="user-name">{{ word }}</span>
+      <span class="user-name">{{ word }} (${{ creditos }} CR)</span>
       <a href="/user/{{ word }}/perfil">
         <div class="user-avatar" title="Perfil">U</div>
       </a>
@@ -341,55 +341,8 @@
       { id:'altura',        label:'Altura',              boxLeft:432, boxTop:580, bodyX:520, bodyY:508, side:'bottom'},
     ]
 
-    // ── User inventory (mock — items won from lootboxes) ─────
-    const INVENTORY = {
-      cabelo:       [
-        { name:'Ondulado — loiro dourado',  rarity:'raro' },
-        { name:'Cacheado — ruivo intenso',  rarity:'epico' },
-        { name:'Platinado natural',          rarity:'lendario' },
-      ],
-      pele:         [
-        { name:'Oliva — luminosa',           rarity:'incomum' },
-        { name:'Ébano — profundo',           rarity:'raro' },
-      ],
-      olhos:        [
-        { name:'Verde musgo',                rarity:'incomum' },
-        { name:'Cinza claro',                rarity:'raro' },
-        { name:'Âmbar',                      rarity:'epico' },
-      ],
-      boca:         [
-        { name:'Lábios carnudos — naturais', rarity:'incomum' },
-        { name:'Sorriso excepcional',        rarity:'epico' },
-      ],
-      nariz:        [
-        { name:'Reto — fino de perfil',      rarity:'raro' },
-        { name:'Grego esculpido',            rarity:'epico' },
-      ],
-      voz:          [
-        { name:'Grave profundo',             rarity:'raro' },
-        { name:'Melodioso — amplo alcance',  rarity:'epico' },
-      ],
-      altura:       [
-        { name:'Média-alta — 180 a 190cm',   rarity:'incomum' },
-        { name:'Alta — 190 a 198cm',         rarity:'raro' },
-      ],
-      inteligencia: [
-        { name:'QI 120–130 — muito alto',    rarity:'raro' },
-        { name:'QI 130–140 — excepcional',   rarity:'epico' },
-      ],
-      carisma:      [
-        { name:'Muito carismático — líder',  rarity:'raro' },
-        { name:'Magnético — irresistível',   rarity:'epico' },
-      ],
-      atleticidade: [
-        { name:'Muito atlético — destacado', rarity:'raro' },
-        { name:'Elite — nível competitivo',  rarity:'epico' },
-      ],
-      imunologico:  [
-        { name:'Excepcional — raramente adoece', rarity:'raro' },
-        { name:'Imunidade avançada',         rarity:'epico' },
-      ],
-    }
+    // ── User inventory ─────
+    const INVENTORY = {{ inventory | tojson | safe }};
 
     const RARITY_LABEL = { comum:'Comum', incomum:'Incomum', raro:'Raro', epico:'Épico', lendario:'Lendário' }
 

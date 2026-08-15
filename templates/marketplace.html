@@ -333,7 +333,7 @@
     </nav>
 
     <div class="navbar-user">
-      <span class="user-name">{{ word }}</span>
+      <span class="user-name">{{ word }} (${{ creditos }} CR)</span>
       <a href="/user/{{ word }}/perfil">
         <div class="user-avatar" title="Perfil">U</div>
       </a>
@@ -419,10 +419,9 @@
   </div>
 
   <div id="marketplace-user" data-user="{{ word }}" hidden></div>
-  <script type="application/json" id="marketplace-data">{{ listings_json }}</script>
 
   <script>
-    const LISTINGS = JSON.parse(document.getElementById('marketplace-data').textContent);
+    const LISTINGS = {{ listings | tojson | safe }};
 
     const rarityLabels = {
       comum: 'Comum',
@@ -490,10 +489,35 @@
 
     // Purchase handler
     function buyItem(id, name, price) {
-      showToast(`Você comprou "${name}" por ${price} CR!`);
-      // Simula remoção do item comprado
-      LISTINGS = LISTINGS.filter(item => item.id !== id);
-      renderListings();
+      const formData = new FormData();
+      formData.append('item_id', id);
+
+      fetch(`/user/{{ word }}/marketplace/buy`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          showToast(`Você comprou "${name}" por ${price} CR!`);
+          
+          // Remove from local listings list
+          LISTINGS = LISTINGS.filter(item => item.id !== id);
+          renderListings();
+          
+          // Update credits display in navbar
+          const balanceEl = document.querySelector('.user-name');
+          if (balanceEl) {
+            balanceEl.textContent = `{{ word }} (${data.new_balance} CR)`;
+          }
+        } else {
+          showToast(data.message || 'Erro ao realizar a compra.');
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showToast('Erro de conexão ao processar compra.');
+      });
     }
 
     // Toast message function

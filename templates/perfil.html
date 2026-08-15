@@ -249,7 +249,7 @@
     </nav>
 
     <div class="navbar-user">
-      <span class="user-name">{{ word }}</span>
+      <span class="user-name">{{ word }} (${{ creditos }} CR)</span>
       <a href="/user/{{ word }}/perfil">
         <div class="user-avatar" title="Perfil" style="border-color: var(--sage);">U</div>
       </a>
@@ -317,33 +317,7 @@
   </div>
 
   <script>
-    // ── Mock data for user's inventory (matching editor.html) ──
-    const INVENTORY = [
-      { name: 'Ondulado — loiro dourado', category: 'Cabelo', type: 'cosmetico', rarity: 'raro' },
-      { name: 'Cacheado — ruivo intenso', category: 'Cabelo', type: 'cosmetico', rarity: 'epico' },
-      { name: 'Platinado natural', category: 'Cabelo', type: 'cosmetico', rarity: 'lendario' },
-      { name: 'Oliva — luminosa', category: 'Pele', type: 'cosmetico', rarity: 'incomum' },
-      { name: 'Ébano — profundo', category: 'Pele', type: 'cosmetico', rarity: 'raro' },
-      { name: 'Verde musgo', category: 'Olhos', type: 'cosmetico', rarity: 'incomum' },
-      { name: 'Cinza claro', category: 'Olhos', type: 'cosmetico', rarity: 'raro' },
-      { name: 'Âmbar', category: 'Olhos', type: 'cosmetico', rarity: 'epico' },
-      { name: 'Lábios carnudos — naturais', category: 'Boca', type: 'cosmetico', rarity: 'incomum' },
-      { name: 'Sorriso excepcional', category: 'Boca', type: 'cosmetico', rarity: 'epico' },
-      { name: 'Reto — fino de perfil', category: 'Nariz', type: 'cosmetico', rarity: 'raro' },
-      { name: 'Grego esculpido', category: 'Nariz', type: 'cosmetico', rarity: 'epico' },
-      { name: 'Grave profundo', category: 'Voz', type: 'cosmetico', rarity: 'raro' },
-      { name: 'Melodioso — amplo alcance', category: 'Voz', type: 'cosmetico', rarity: 'epico' },
-      { name: 'Média-alta — 180 a 190cm', category: 'Altura', type: 'atributo', rarity: 'incomum' },
-      { name: 'Alta — 190 a 198cm', category: 'Altura', type: 'atributo', rarity: 'raro' },
-      { name: 'QI 120–130 — muito alto', category: 'Inteligência', type: 'atributo', rarity: 'raro' },
-      { name: 'QI 130–140 — excepcional', category: 'Inteligência', type: 'atributo', rarity: 'epico' },
-      { name: 'Muito carismático — líder', category: 'Carisma', type: 'atributo', rarity: 'raro' },
-      { name: 'Magnético — irresistível', category: 'Carisma', type: 'atributo', rarity: 'epico' },
-      { name: 'Muito atlético — destacado', category: 'Atleticidade', type: 'atributo', rarity: 'raro' },
-      { name: 'Elite — nível competitivo', category: 'Atleticidade', type: 'atributo', rarity: 'epico' },
-      { name: 'Excepcional — raramente adoece', category: 'Sist. Imunológico', type: 'atributo', rarity: 'raro' },
-      { name: 'Imunidade avançada', category: 'Sist. Imunológico', type: 'atributo', rarity: 'epico' }
-    ];
+    const INVENTORY = {{ inventory | tojson | safe }};
 
     const rarityLabels = {
       comum: 'Comum',

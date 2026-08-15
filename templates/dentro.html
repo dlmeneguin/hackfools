@@ -303,7 +303,7 @@
     </nav>
 
     <div class="navbar-user">
-      <span class="user-name">{{ word }}</span>
+      <span class="user-name">{{ word }} (${{ creditos }} CR)</span>
       <a href="/user/{{ word }}/perfil">
         <div class="user-avatar" title="Perfil">U</div>
       </a>
@@ -328,7 +328,7 @@
           <p class="welcome-stat-label">Lootboxes abertas</p>
         </div>
         <div class="welcome-stat" style="border-left:1px solid var(--border);padding-left:24px;">
-          <p class="welcome-stat-num">7</p>
+          <p class="welcome-stat-num">{{ traits_ativos }}</p>
           <p class="welcome-stat-label">Traits ativos</p>
         </div>
         <div class="welcome-stat" style="border-left:1px solid var(--border);padding-left:24px;">

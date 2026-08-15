@@ -279,6 +279,89 @@
       transform: translateY(-1px);
     }
 
+    /* ── Lootbox Opening Animation ── */
+    .spinner-container {
+      position: relative; width: 100%; height: 110px; overflow: hidden;
+      margin: 20px 0; border: 1.5px solid var(--border); border-radius: 12px;
+      background: var(--cream); display: flex; align-items: center;
+    }
+    .spinner-line {
+      position: absolute; left: 50%; top: 0; bottom: 0; width: 2px;
+      background: #c4a55a; z-index: 10; box-shadow: 0 0 10px #c4a55a;
+    }
+    .spinner-track {
+      display: flex; gap: 8px; padding-left: calc(50% - 60px);
+      transition: transform 3s cubic-bezier(0.1, 0.8, 0.15, 1);
+      align-items: center;
+    }
+    .spinner-card {
+      width: 120px; height: 90px; flex-shrink: 0; border-radius: 8px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 10px; font-size: 11px; font-weight: 500;
+      color: var(--text); position: relative;
+    }
+    .spinner-card .item-rarity-badge {
+      font-size: 8px; text-transform: uppercase; font-weight: 600;
+      padding: 2px 6px; border-radius: 100px; color: var(--cream);
+      margin-top: 6px;
+    }
+    .spinner-card .item-icon {
+      font-size: 20px; margin-bottom: 4px;
+    }
+    .spinner-card.rarity-comum    { border-top: 4px solid var(--faint); }
+    .spinner-card.rarity-incomum  { border-top: 4px solid var(--sage); }
+    .spinner-card.rarity-raro     { border-top: 4px solid var(--blush); }
+    .spinner-card.rarity-epico    { border-top: 4px solid #a98bd4; }
+    .spinner-card.rarity-lendario { border-top: 4px solid #c4a55a; }
+
+    /* ── Reward Screen ── */
+    .reward-sparkle {
+      font-size: 54px; margin-bottom: 12px;
+      animation: rewardPulse 1.2s infinite alternate ease-in-out;
+    }
+    @keyframes rewardPulse {
+      0% { transform: scale(0.95); filter: drop-shadow(0 0 2px rgba(196,165,90,0.1)); }
+      100% { transform: scale(1.05); filter: drop-shadow(0 0 15px rgba(196,165,90,0.7)); }
+    }
+    .reward-card {
+      display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 32px 48px; border-radius: 16px; background: var(--cream);
+      border: 1.5px solid var(--border); box-shadow: 0 16px 40px rgba(0,0,0,0.06);
+      min-width: 280px; position: relative; overflow: hidden;
+      margin-top: 10px;
+    }
+    .reward-rarity-badge {
+      position: absolute; top: 14px; right: 14px; font-size: 9px; font-weight: 600;
+      text-transform: uppercase; padding: 2px 8px; border-radius: 100px;
+      color: var(--cream);
+    }
+    .reward-rarity-badge.comum    { background: var(--faint); }
+    .reward-rarity-badge.incomum  { background: var(--sage); }
+    .reward-rarity-badge.raro     { background: var(--blush); }
+    .reward-rarity-badge.epico    { background: #a98bd4; }
+    .reward-rarity-badge.lendario { background: #c4a55a; }
+    .reward-icon {
+      font-size: 48px; margin-bottom: 14px;
+    }
+    .reward-name {
+      font-size: 19px; font-weight: 600; color: var(--text); margin-bottom: 6px;
+    }
+    .reward-category {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+    }
+
+    /* Toast style */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px; z-index: 100;
+      background: var(--text); color: var(--cream);
+      padding: 14px 24px; border-radius: 100px; font-size: 14px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+      opacity: 0; transform: translateY(16px); pointer-events: none;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
     @media (max-width: 900px) {
       .navbar { padding: 0 20px; }
       .navbar-nav { display: none; }
@@ -344,28 +427,75 @@
   <!-- ── Popup overlay ── -->
   <div class="overlay" id="overlay" role="dialog" aria-modal="true">
     <div class="modal" id="modal">
-      <div class="modal-header">
-        <div>
-          <p class="modal-eyebrow" id="modal-eyebrow"></p>
-          <h2 class="modal-title" id="modal-title"></h2>
+      
+      <!-- Panel 1: Box Details -->
+      <div id="panel-details" style="display: flex; flex-direction: column; height: 100%;">
+        <div class="modal-header">
+          <div>
+            <p class="modal-eyebrow" id="modal-eyebrow"></p>
+            <h2 class="modal-title" id="modal-title"></h2>
+          </div>
+          <button class="modal-close" id="modal-close" aria-label="Fechar">×</button>
         </div>
-        <button class="modal-close" id="modal-close" aria-label="Fechar">×</button>
-      </div>
-      <p class="modal-desc" id="modal-desc"></p>
-      <div class="modal-body">
-        <ul class="items-list" id="modal-items" style="list-style:none;"></ul>
-      </div>
-      <div class="modal-footer">
-        <div class="rarity-legend">
-          <span class="legend-item"><span class="rarity-pip rarity-comum"></span>Comum</span>
-          <span class="legend-item"><span class="rarity-pip rarity-incomum"></span>Incomum</span>
-          <span class="legend-item"><span class="rarity-pip rarity-raro"></span>Raro</span>
-          <span class="legend-item"><span class="rarity-pip rarity-epico"></span>Épico</span>
-          <span class="legend-item"><span class="rarity-pip rarity-lendario"></span>Lendário</span>
+        <p class="modal-desc" id="modal-desc"></p>
+        <div class="modal-body">
+          <ul class="items-list" id="modal-items" style="list-style:none;"></ul>
         </div>
-        <button class="btn-open-box" id="btn-open-box">Abrir caixa</button>
+        <div class="modal-footer">
+          <div class="rarity-legend">
+            <span class="legend-item"><span class="rarity-pip rarity-comum"></span>Comum</span>
+            <span class="legend-item"><span class="rarity-pip rarity-incomum"></span>Incomum</span>
+            <span class="legend-item"><span class="rarity-pip rarity-raro"></span>Raro</span>
+            <span class="legend-item"><span class="rarity-pip rarity-epico"></span>Épico</span>
+            <span class="legend-item"><span class="rarity-pip rarity-lendario"></span>Lendário</span>
+          </div>
+          <button class="btn-open-box" id="btn-open-box">Abrir caixa (300 CR)</button>
+        </div>
       </div>
+
+      <!-- Panel 2: Opening Animation -->
+      <div id="panel-opening" style="display: none; flex-direction: column; height: 100%; justify-content: center; align-items: center; padding: 40px 24px;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <p class="modal-eyebrow" style="color: var(--faint);">Sequenciador de DNA</p>
+          <h2 class="modal-title">Sintetizando Gene...</h2>
+        </div>
+        <div class="spinner-container">
+          <div class="spinner-line"></div>
+          <div class="spinner-track" id="spinner-track"></div>
+        </div>
+        <p style="text-align: center; color: var(--muted); font-size: 13px; margin-top: 15px;">
+          Aguarde. Isolando amostra genética e refinando cromossomos...
+        </p>
+      </div>
+
+      <!-- Panel 3: Reward View -->
+      <div id="panel-reward" style="display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px 24px;">
+        <div class="reward-sparkle">🧬</div>
+        <h2 style="font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; color: var(--text); margin-bottom: 6px;">
+          Gene Sintetizado!
+        </h2>
+        <p style="color: var(--muted); font-size: 13px; margin-bottom: 24px;">
+          A nova característica genética foi adicionada ao seu inventário.
+        </p>
+        
+        <div class="reward-card" id="reward-card">
+          <div class="reward-rarity-badge" id="reward-rarity-badge">Raro</div>
+          <div class="reward-icon" id="reward-icon">💇</div>
+          <div class="reward-name" id="reward-name">Platinado natural</div>
+          <div class="reward-category" id="reward-category">Cabelo</div>
+        </div>
+
+        <div style="margin-top: 32px; display: flex; gap: 12px; width: 100%;">
+          <button class="btn-open-box" id="btn-reward-close" style="background: var(--muted); box-shadow: none;">Fechar</button>
+          <button class="btn-open-box" id="btn-reward-again">Abrir Outra (300 CR)</button>
+        </div>
+      </div>
+
     </div>
+  </div>
+
+  <div class="toast" id="toast">
+    <span id="toast-message"></span>
   </div>
 
   <script>
@@ -625,8 +755,15 @@
     const overlay  = document.getElementById('overlay')
     const modalEl  = document.getElementById('modal')
     const closeBtn = document.getElementById('modal-close')
+    let currentBox = null
 
     function openModal(box) {
+      currentBox = box
+      // Reset view to show details panel
+      document.getElementById('panel-details').style.display = 'flex'
+      document.getElementById('panel-opening').style.display = 'none'
+      document.getElementById('panel-reward').style.display = 'none'
+
       document.getElementById('modal-eyebrow').textContent = box.sub
       document.getElementById('modal-title').textContent   = box.name
       document.getElementById('modal-desc').textContent    = box.desc
@@ -675,10 +812,125 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) closeModal() })
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal() })
 
-    document.getElementById('btn-open-box').addEventListener('click', () => {
-      // Placeholder — wire to real open logic
-      closeModal()
-    })
+    // Toast logic
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    let toastTimeout;
+    
+    function showToast(message) {
+      clearTimeout(toastTimeout);
+      toastMessage.textContent = message;
+      toast.classList.add('show');
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    function handleOpenBox() {
+      if (!currentBox) return
+
+      const formData = new FormData()
+      formData.append('category', currentBox.id)
+
+      // Transition to opening panel
+      document.getElementById('panel-details').style.display = 'none'
+      document.getElementById('panel-opening').style.display = 'flex'
+
+      const track = document.getElementById('spinner-track')
+      track.style.transition = 'none'
+      track.style.transform = 'translateX(0)'
+      track.innerHTML = ''
+
+      // Populate placeholder track cards
+      const boxItems = currentBox.items
+      const totalSpinnerItems = 35
+      const winningIndex = 29
+      const cards = []
+
+      for (let i = 0; i < totalSpinnerItems; i++) {
+        const placeholder = boxItems[Math.floor(Math.random() * boxItems.length)]
+        cards.push(placeholder)
+      }
+
+      cards.forEach((item, index) => {
+        const cardEl = document.createElement('div')
+        cardEl.className = `spinner-card rarity-${item.rarity}`
+        cardEl.id = `spinner-card-${index}`
+        cardEl.innerHTML = `
+          <span class="item-icon">${currentBox.icon}</span>
+          <span class="item-name">${item.name}</span>
+          <span class="item-rarity-badge rarity-${item.rarity}">${item.rarity}</span>
+        `
+        track.appendChild(cardEl)
+      })
+
+      fetch(`/user/{{ word }}/lootbox/open`, {
+        method: 'POST',
+        body: formData
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          const wonItem = data.item
+
+          const winningCardEl = document.getElementById(`spinner-card-${winningIndex}`)
+          if (winningCardEl) {
+            winningCardEl.className = `spinner-card rarity-${wonItem.rarity}`
+            winningCardEl.innerHTML = `
+              <span class="item-icon">${currentBox.icon}</span>
+              <span class="item-name">${wonItem.name}</span>
+              <span class="item-rarity-badge rarity-${wonItem.rarity}">${wonItem.rarity}</span>
+            `
+          }
+
+          // Spin the wheel
+          setTimeout(() => {
+            track.style.transition = 'transform 3s cubic-bezier(0.1, 0.8, 0.15, 1)'
+            const cardWidth = 120
+            const gap = 8
+            const itemOffset = winningIndex * (cardWidth + gap)
+            const randomOffset = Math.floor(Math.random() * 60) - 30
+            track.style.transform = `translateX(-${itemOffset + randomOffset}px)`
+          }, 50)
+
+          // Show reward
+          setTimeout(() => {
+            const winningCard = document.getElementById(`spinner-card-${winningIndex}`)
+            if (winningCard) winningCard.classList.add('won')
+
+            setTimeout(() => {
+              const balanceEl = document.querySelector('.user-name')
+              if (balanceEl) {
+                balanceEl.textContent = `{{ word }} (${data.new_balance} CR)`
+              }
+
+              document.getElementById('reward-rarity-badge').className = `reward-rarity-badge ${wonItem.rarity}`
+              document.getElementById('reward-rarity-badge').textContent = wonItem.rarity
+              document.getElementById('reward-icon').textContent = currentBox.icon
+              document.getElementById('reward-name').textContent = wonItem.name
+              document.getElementById('reward-category').textContent = currentBox.name
+
+              document.getElementById('panel-opening').style.display = 'none'
+              document.getElementById('panel-reward').style.display = 'flex'
+            }, 600)
+
+          }, 3100)
+
+        } else {
+          showToast(data.message || 'Erro ao abrir caixa.')
+          closeModal()
+        }
+      })
+      .catch(err => {
+        console.error(err)
+        showToast('Erro de conexão ao processar abertura de caixa.')
+        closeModal()
+      })
+    }
+
+    document.getElementById('btn-open-box').addEventListener('click', handleOpenBox)
+    document.getElementById('btn-reward-again').addEventListener('click', handleOpenBox)
+    document.getElementById('btn-reward-close').addEventListener('click', closeModal)
   </script>
 </body>
 </html>

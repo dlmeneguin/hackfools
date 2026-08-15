@@ -1,0 +1,117 @@
+ITENS GENÉTICOS DO SISTEMA HELIX
+
+================================================================================
+CATEGORIA: CABELO (tipo: cosmetico)
+================================================================================
+- Liso fino — castanho | Rarity: comum
+- Liso grosso — preto | Rarity: comum
+- Ondulado — castanho claro | Rarity: comum
+- Cacheado — ruivo | Rarity: incomum
+- Crespo — preto profundo | Rarity: incomum
+- Ondulado — loiro dourado | Rarity: raro
+- Cacheado — ruivo intenso | Rarity: epico
+- Platinado natural | Rarity: lendario
+
+================================================================================
+CATEGORIA: PELE (tipo: cosmetico)
+================================================================================
+- Clara — textura suave | Rarity: comum
+- Bege — poros finos | Rarity: comum
+- Morena — uniforme | Rarity: comum
+- Oliva — luminosa | Rarity: incomum
+- Escura — aveludada | Rarity: incomum
+- Ébano — profundo | Rarity: raro
+- Dourada — pigmentação rara | Rarity: epico
+- Translúcida perolada | Rarity: lendario
+
+================================================================================
+CATEGORIA: OLHOS (tipo: cosmetico)
+================================================================================
+- Castanho escuro | Rarity: comum
+- Castanho claro | Rarity: comum
+- Verde musgo | Rarity: incomum
+- Azul acinzentado | Rarity: incomum
+- Avelã misto | Rarity: incomum
+- Cinza claro | Rarity: raro
+- Âmbar | Rarity: epico
+- Heterocromia | Rarity: lendario
+
+================================================================================
+CATEGORIA: BOCA (tipo: cosmetico)
+================================================================================
+- Lábios finos — simétricos | Rarity: comum
+- Lábios médios — definidos | Rarity: comum
+- Lábios carnudos — naturais | Rarity: incomum
+- Assimetria natural — marcante | Rarity: raro
+- Sorriso excepcional | Rarity: epico
+
+================================================================================
+CATEGORIA: NARIZ (tipo: cosmetico)
+================================================================================
+- Reto — médio | Rarity: comum
+- Arredondado — suave | Rarity: comum
+- Aquilino — elegante | Rarity: incomum
+- Snub — delicado | Rarity: incomum
+- Reto — fino de perfil | Rarity: raro
+- Grego esculpido | Rarity: epico
+
+================================================================================
+CATEGORIA: VOZ (tipo: cosmetico)
+================================================================================
+- Médio neutro | Rarity: comum
+- Médio-grave — caloroso | Rarity: comum
+- Grave — encorpado | Rarity: incomum
+- Agudo — cristalino | Rarity: incomum
+- Grave profundo | Rarity: raro
+- Melodioso — amplo alcance | Rarity: epico
+- Voz excepcional — única | Rarity: lendario
+
+================================================================================
+CATEGORIA: ALTURA (tipo: atributo)
+================================================================================
+- Baixa — abaixo de 160cm | Rarity: comum
+- Média-baixa — 160 a 170cm | Rarity: comum
+- Média — 170 a 180cm | Rarity: comum
+- Média-alta — 180 a 190cm | Rarity: incomum
+- Alta — 190 a 198cm | Rarity: raro
+- Excepcional — acima de 198cm | Rarity: epico
+
+================================================================================
+CATEGORIA: INTELIGÊNCIA (tipo: atributo)
+================================================================================
+- QI 90–100 — médio | Rarity: comum
+- QI 100–110 — médio-alto | Rarity: comum
+- QI 110–120 — alto | Rarity: incomum
+- QI 120–130 — muito alto | Rarity: raro
+- QI 130–140 — excepcional | Rarity: epico
+- QI 140+ — genial | Rarity: lendario
+
+================================================================================
+CATEGORIA: CARISMA (tipo: atributo)
+================================================================================
+- Reservado — introvertido | Rarity: comum
+- Amigável — sociável | Rarity: comum
+- Carismático — cativante | Rarity: incomum
+- Muito carismático — líder | Rarity: raro
+- Magnético — irresistível | Rarity: epico
+- Lendário — uma geração | Rarity: lendario
+
+================================================================================
+CATEGORIA: ATLETICIDADE (tipo: atributo)
+================================================================================
+- Base sedentária | Rarity: comum
+- Mediano — funcional | Rarity: comum
+- Atlético — acima da média | Rarity: incomum
+- Muito atlético — destacado | Rarity: raro
+- Elite — nível competitivo | Rarity: epico
+- Sobre-humano | Rarity: lendario
+
+================================================================================
+CATEGORIA: SIST. IMUNOLÓGICO (tipo: atributo)
+================================================================================
+- Fraco — suscetível | Rarity: comum
+- Abaixo da média | Rarity: comum
+- Médio — funcional | Rarity: comum
+- Robusto — resistente | Rarity: incomum
+- Excepcional — raramente adoece | Rarity: raro
+- Imunidade avançada | Rarity: epico
